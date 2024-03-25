@@ -52,6 +52,7 @@ body {
 	margin:auto;
 	font-family: 'Work Sans' ;
 	font-size: 14px;
+	background-color: #fffef8;
 }
 header {
 	display: flex;
@@ -62,6 +63,7 @@ section {
 	margin: 50px 0
 }
 
+/********************************************** Header **********************************************/
 h1{
 	display: flex;
 	flex-direction: column;
@@ -98,6 +100,8 @@ nav li {
 li:hover {
 	color: #B1663C;
 }
+
+/********************************************** Section Intro **********************************************/
 #introduction {
 	display: flex;
 	align-items: center;
@@ -121,11 +125,13 @@ li:hover {
 #introduction p {
 	margin-bottom: 0.5em;
 }
+
+/********************************************** Section Portfolio **********************************************/
 #portfolio h2 {
 	text-align: center;
 	margin-bottom: 1em;
 }
-.gallery {
+.gallery-container {
 	width: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
@@ -133,10 +139,12 @@ li:hover {
 	grid-row-gap: 20px;
 }
 
-.gallery img {
+.gallery-container img {
 	width: 100%;
 
 }
+
+/********************************************** Section Contact **********************************************/
 #contact {
 	width: 50%;
 margin: auto;
@@ -180,6 +188,7 @@ input[type="submit"]{
 	border-radius: 60px ;
 }
 
+/********************************************** Footer **********************************************/
 footer nav ul {
 	display: flex;
 	justify-content: flex-end;
