@@ -27,6 +27,7 @@ else {
 document.addEventListener("DOMContentLoaded", function () {
   // Appelle la fonction pour charger les projets depuis l'API
   fetchAndDisplayProjects();
+  setupModal();
 });
 
 // Ajoute un écouteur d'événement de clic sur le bouton de connexion (loginButton).
@@ -71,7 +72,7 @@ function fetchAndDisplayProjects() {
     );
 }
 
-// Affiche les projets sous forme de galerie 
+// Affiche les projets sous forme de galerie
 function displayProjects(data) {
   // Sélectionne le conteneur de la galerie dans le DOM
   const galleryContainer = document.getElementById("GalleryContainer");
@@ -147,4 +148,58 @@ function filterProjects(filterId) {
     project.style.display =
       filterId === "all" || project.dataset.category === filterId ? "" : "none";
   });
+}
+
+function setupModal() {
+  // Sélectionne tous les éléments avec la classe .icon et attache un gestionnaire d'événements de clic
+  // pour ouvrir la modale identifiée par l'ID "myModal".
+  const icons = document.querySelectorAll(".icon");
+  icons.forEach((icon) => {
+    icon.addEventListener("click", () => {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "block";
+    });
+  });
+
+  // Sélectionne le bouton de fermeture original dans la modale et attache un gestionnaire d'événements de clic
+  // pour fermer la modale en modifiant son style pour qu'elle ne soit pas affichée.
+  const closeModalOriginal = document.querySelector(".modal .close-original");
+  closeModalOriginal.addEventListener("click", () => {
+    const modal = document.getElementById("myModal");
+    modal.style.display = "none";
+  });
+
+  // Sélectionne un second bouton de fermeture dans la modale et réalise la même action que le premier
+  // bouton de fermeture pour cacher la modale lors du clic.
+  const closeModalSeconde = document.querySelector(".modal .close-seconde");
+  closeModalSeconde.addEventListener("click", () => {
+    const modal = document.getElementById("myModal");
+    modal.style.display = "none";
+  });
+
+  // Ajoute un gestionnaire d'événements au niveau de la fenêtre pour fermer la modale si l'utilisateur
+  // clique à l'extérieur de celle-ci (c'est-à-dire sur le fond).
+  window.addEventListener("click", (event) => {
+    const modal = document.getElementById("myModal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  });
+
+  // Sélectionne un bouton pour revenir au contenu original de la modale depuis un second contenu.
+  // Si ce bouton existe, attache un gestionnaire d'événements de clic pour changer l'affichage
+  // entre le contenu original et le second contenu de la modale.
+  const backSecond = document.querySelector(".back-seconde");
+  if (backSecond) {
+    backSecond.addEventListener("click", () => {
+      const originalContent = document.querySelector(".modal-original");
+      const secondContent = document.querySelector(".modal-seconde");
+
+      // Assure que les deux contenus existent avant de tenter de modifier leur affichage.
+      if (originalContent && secondContent) {
+        secondContent.style.display = "none"; // Cache le second contenu
+        originalContent.style.display = "block"; // Montre le contenu original
+      }
+    });
+  }
 }
