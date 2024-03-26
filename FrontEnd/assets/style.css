@@ -129,11 +129,15 @@ table {
 }
 /** end reset css**/
 body {
-  max-width: 1140px;
-  margin: auto;
+  margin: 0;
+  padding: 0;
   font-family: "Work Sans";
   font-size: 14px;
   background-color: #fffef8;
+}
+.contenu-principal {
+  max-width: 1140px;
+  margin: auto;
 }
 header {
   display: flex;
@@ -146,6 +150,22 @@ section {
 
 .insta-icon {
   height: 20px;
+}
+
+#btn {
+  font-size: 15px;
+  font-weight: 400;
+  padding: 7px 30px;
+  border: 1px solid #1d6154;
+  background-color: #1d6154;
+  color: white;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 20px;
+}
+#btn:hover {
+  background: #0e2f28;
 }
 
 /********************************************** Header **********************************************/
@@ -212,7 +232,8 @@ li:hover {
 /********************************************** Section Portfolio **********************************************/
 #portfolio h2 {
   text-align: center;
-  margin-bottom: 1em;
+  margin-bottom: 1.5em;
+  margin-right: 25px;
 }
 
 /********************************************** Filtres **********************************************/
@@ -242,7 +263,7 @@ li:hover {
 }
 
 /********************************************** Gallery **********************************************/
-.gallery-container {
+.gallery-container-original {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -250,7 +271,7 @@ li:hover {
   grid-row-gap: 20px;
 }
 
-.gallery-container img {
+.gallery-container-original img {
   width: 100%;
 }
 
@@ -302,4 +323,316 @@ footer nav ul {
   display: flex;
   justify-content: flex-end;
   margin: 2em;
+}
+
+/********************************************** LoginPage **********************************************/
+.body-login-page {
+  height: 90vh;
+}
+
+.main-login-page {
+  margin-top: 100px;
+  height: 65vh;
+}
+
+.title-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 25px;
+}
+
+.login-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 27%;
+}
+
+#loginForm label {
+  margin-bottom: 5px;
+  padding-left: 10px;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+#loginForm input {
+  margin-bottom: 25px;
+  border: none;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.116);
+  height: 40px;
+  width: 300px;
+}
+
+.login-btn {
+  font-family: "Work Sans";
+}
+
+.mdp {
+  margin-top: 25px;
+  border-bottom: 1px solid black;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/********************************************** Bannière Mode Édition **********************************************/
+
+.edition-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  height: 50px;
+  width: 100%;
+  color: white;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-container i {
+  margin-right: 10px;
+}
+
+/********************************************** Section Portfolio Après Connexion **********************************************/
+
+.title-portfolio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-portfolio {
+  display: flex;
+  margin-bottom: 40px;
+  cursor: pointer;
+}
+
+.icon-portfolio i {
+  font-weight: 500;
+  font-size: 15px;
+  margin-right: 5px;
+}
+
+/********************************************** Modal Part 1 **********************************************/
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border-radius: 25px;
+  width: 25%;
+  text-align: center;
+}
+
+.title-modal {
+  font-size: 25px;
+}
+
+.container-close {
+  width: 100%;
+}
+
+.close-original {
+  display: flex;
+  justify-content: flex-end;
+  color: #000000;
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.gallery-container-modal {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  padding: 30px 60px;
+}
+
+.gallery-item-modal {
+  position: relative;
+  display: block;
+  width: 70px;
+  height: 100px;
+}
+
+.gallery-item-modal img {
+  width: 100%;
+  height: auto;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 20px;
+  width: 20px;
+  border-radius: 3px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.fa-trash-can {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.container-separation {
+  width: 100%;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.separation {
+  border-top: 2px solid #e3e3e3;
+  width: 75%;
+}
+
+.add-img {
+  width: 250px;
+}
+
+/********************************************** Modal Part 2 **********************************************/
+.modal-seconde {
+  display: none;
+}
+
+.icon-container-seconde {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-seconde {
+  color: #000000;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.fa-arrow-left {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/*----------- Upload IMG -----------*/
+.upload-container {
+  margin-top: 15px;
+  display: flex;
+  height: 150px;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  background-color: #e8f1f6;
+}
+
+.custom-file-upload {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.fa-image {
+  margin-top: 15px;
+  font-size: 60px;
+  color: #b9c5cc;
+  cursor: pointer;
+}
+
+.upload-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  background: #b9c5cc;
+  color: rgb(48, 102, 133);
+  font-size: 15px;
+  font-weight: 550;
+  border-radius: 25px;
+  width: 45%;
+  height: 35px;
+  cursor: pointer;
+}
+
+.infos-upload {
+  margin-top: 5px;
+  font-size: 11px;
+}
+
+/*----------- Formulaire -----------*/
+.title-and-catégorie {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  gap: 15px;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cointainer-form-title {
+  display: flex;
+  flex-direction: column;
+}
+.form-title {
+  width: 100%;
+  display: flex;
+  margin-bottom: 5px;
+}
+.cointainer-form-title input {
+  height: 40px;
+  border: none;
+  box-shadow: 0px 10px 20px rgba(150, 150, 150, 0.5);
+}
+
+.cointainer-form-catégorie {
+  display: flex;
+  flex-direction: column;
+}
+.form-catégorie {
+  width: 100%;
+  display: flex;
+  margin-bottom: 5px;
+}
+.cointainer-form-catégorie select {
+  height: 40px;
+  border: none;
+  box-shadow: 0px 10px 20px rgba(150, 150, 150, 0.5);
+  cursor: pointer;
 }
