@@ -4,51 +4,54 @@ const loginButton = document.getElementById("loginButton");
 const editionContainer = document.getElementById("editionContainer");
 const IconPortfolio = document.querySelector(".icon-portfolio");
 
-// // Récupère l'état de connexion depuis LocalStorage
-let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+function updateUIBasedOnLogin() {
+  // // Récupère l'état de connexion depuis LocalStorage
+  let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-// Met à jour l'affichage Connexion/Déconnexion
-loginButton.textContent = isLoggedIn ? "logout" : "login";
+  // Met à jour l'affichage Connexion/Déconnexion
+  loginButton.textContent = isLoggedIn ? "logout" : "login";
 
-// Quand Connecté
-if (isLoggedIn) {
-  filterContainer.style.display = "none";
-  editionContainer.style.display = "";
-  IconPortfolio.style.display = "";
-}
-// Quand Déconnecté
-else {
-  filterContainer.style.display = "";
-  editionContainer.style.display = "none";
-  IconPortfolio.style.display = "none";
+  // Quand Connecté
+  if (isLoggedIn) {
+    filterContainer.style.display = "none";
+    editionContainer.style.display = "";
+    IconPortfolio.style.display = "";
+  }
+  // Quand Déconnecté
+  else {
+    filterContainer.style.display = "";
+    editionContainer.style.display = "none";
+    IconPortfolio.style.display = "none";
+  }
+
+  // Ajoute un écouteur d'événement de clic sur le bouton de connexion (loginButton).
+  loginButton.addEventListener("click", () => {
+    // Vérifie si l'utilisateur est actuellement connecté en examinant la variable isLoggedIn.
+    if (isLoggedIn) {
+      // Si l'utilisateur est connecté (isLoggedIn est vrai), exécute les actions suivantes pour se déconnecter :
+
+      // Supprime l'indicateur de connexion du stockage local, ce qui efface l'état de connexion persistant.
+      localStorage.removeItem("isLoggedIn");
+      // Supprime également le token d'authentification du stockage local.
+      localStorage.removeItem("token");
+
+      // Met à jour la variable d'état de connexion pour refléter que l'utilisateur n'est plus connecté.
+      isLoggedIn = false;
+      // Rafraîchit la page pour réinitialiser l'état de l'interface utilisateur en fonction du nouvel état de connexion.
+      window.location.reload();
+    } else {
+      // Si l'utilisateur n'est pas connecté (isLoggedIn est faux), redirige vers la page de connexion.
+      window.location.href = "login.html";
+    }
+  });
 }
 
 // Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
 document.addEventListener("DOMContentLoaded", function () {
   // Appelle la fonction pour charger les projets depuis l'API
   fetchAndDisplayProjects();
-  setupModal();
-});
-
-// Ajoute un écouteur d'événement de clic sur le bouton de connexion (loginButton).
-loginButton.addEventListener("click", () => {
-  // Vérifie si l'utilisateur est actuellement connecté en examinant la variable isLoggedIn.
-  if (isLoggedIn) {
-    // Si l'utilisateur est connecté (isLoggedIn est vrai), exécute les actions suivantes pour se déconnecter :
-
-    // Supprime l'indicateur de connexion du stockage local, ce qui efface l'état de connexion persistant.
-    localStorage.removeItem("isLoggedIn");
-    // Supprime également le token d'authentification du stockage local.
-    localStorage.removeItem("token");
-
-    // Met à jour la variable d'état de connexion pour refléter que l'utilisateur n'est plus connecté.
-    isLoggedIn = false;
-    // Rafraîchit la page pour réinitialiser l'état de l'interface utilisateur en fonction du nouvel état de connexion.
-    window.location.reload();
-  } else {
-    // Si l'utilisateur n'est pas connecté (isLoggedIn est faux), redirige vers la page de connexion.
-    window.location.href = "login.html";
-  }
+  // setupModal();
+  updateUIBasedOnLogin();
 });
 
 // Fonction pour charger les projets et les catégories depuis l'API et les afficher
