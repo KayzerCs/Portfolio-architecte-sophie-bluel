@@ -1,12 +1,27 @@
 export const baseURL = "http://localhost:5678/api/";
 const filterContainer = document.getElementById("FiltersContainer");
 const loginButton = document.getElementById("loginButton");
+const editionContainer = document.getElementById("editionContainer");
+const IconPortfolio = document.querySelector(".icon-portfolio");
 
 // // Récupère l'état de connexion depuis LocalStorage
 let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
 // Met à jour l'affichage Connexion/Déconnexion
 loginButton.textContent = isLoggedIn ? "logout" : "login";
+
+// Quand Connecté
+if (isLoggedIn) {
+  filterContainer.style.display = "none";
+  editionContainer.style.display = "";
+  IconPortfolio.style.display = "";
+}
+// Quand Déconnecté
+else {
+  filterContainer.style.display = "";
+  editionContainer.style.display = "none";
+  IconPortfolio.style.display = "none";
+}
 
 // Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
 document.addEventListener("DOMContentLoaded", function () {
