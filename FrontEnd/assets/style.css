@@ -428,3 +428,103 @@ footer nav ul {
   font-size: 15px;
   margin-right: 5px;
 }
+
+/********************************************** Modal Part 1 **********************************************/
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border-radius: 25px;
+  width: 25%;
+  text-align: center;
+}
+
+.title-modal {
+  font-size: 25px;
+}
+
+.container-close {
+  width: 100%;
+}
+
+.close-original {
+  display: flex;
+  justify-content: flex-end;
+  color: #000000;
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.gallery-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  padding: 30px 60px;
+}
+
+.gallery-item {
+  position: relative;
+  display: block;
+  width: 70px;
+  height: 100px;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 20px;
+  width: 20px;
+  border-radius: 3px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.fa-trash-can {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.container-separation {
+  width: 100%;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.separation {
+  border-top: 2px solid #e3e3e3;
+  width: 75%;
+}
+
+.add-img {
+  width: 250px;
+}
