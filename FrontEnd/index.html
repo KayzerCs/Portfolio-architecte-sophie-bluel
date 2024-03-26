@@ -19,7 +19,6 @@
   </head>
 
   <body>
-
     <div class="edition-container" id="editionContainer">
       <div class="icon-container">
         <div class="icon" data-modal-target="#maModal">
@@ -31,66 +30,66 @@
       </div>
     </div>
 
-	<!------------------------------------- Modal ------------------------------------->
+    <!------------------------------------- Modal ------------------------------------->
     <div id="myModal" class="modal">
-		<section class="modal-original">
-		  <div class="modal-content">
-			<div class="container-close">
-			  <span class="close-original">&times;</span>
-			</div>
-			<h3 class="title-modal">Galerie photo</h3>
-			<div class="gallery-container"></div>
-			<div class="container-separation">
-			  <div class="separation"></div>
-			</div>
-			<button class="add-img" id="btn" ;>Ajouter une photo</button>
-		  </div>
-		</section>
-  
-		<section class="modal-seconde">
-		  <div class="modal-content">
-			<div class="icon-container-seconde">
-			  <span class="back-seconde">
-				<i class="fa-solid fa-arrow-left"></i>
-			  </span>
-			  <span class="close-seconde">&times;</span> 
-			</div>
-  
-			<h3 class="title-modal">Ajout photo</h3>
-  
-			<div class="upload-container">
-			  <input type="file" id="file-upload" style="display: none" />
-			  <label for="file-upload" class="custom-file-upload">
-				<i class="fa-regular fa-image"></i>
-				<span class="upload-img">+ Ajout photo</span>
-				<span class="infos-upload">jpg, png : 4mo max</span>
-			  </label>
-			</div>
-  
-			<div class="title-and-catégorie">
-			  <div class="cointainer-form-title">
-				<label class="form-title" for="titre">Titre</label>
-				<input type="text" id="titre" name="titre" placeholder="" />
-			  </div>
-			  <div class="cointainer-form-catégorie">
-				<label class="form-catégorie" for="categorie">Catégorie</label>
-				<select id="categorie" name="categorie">
-				  <option value="option1">Option 1</option>
-				  <option value="option2">Option 2</option>
-				  <option value="option3">Option 3</option>
-				</select>
-			  </div>
-			</div>
-  
-			<div class="container-separation">
-			  <div class="separation"></div>
-			</div>
-  
-			<button class="valide" id="btn" ;>Valider</button>
-		  </div>
-		</section>
-	  </div>
-	  <!---------------------------------------------------------------------------------->
+      <section class="modal-original">
+        <div class="modal-content">
+          <div class="container-close">
+            <span class="close-original">&times;</span>
+          </div>
+          <h3 class="title-modal">Galerie photo</h3>
+          <div class="gallery-container" id="GalleryContainer"></div>
+          <div class="container-separation">
+            <div class="separation"></div>
+          </div>
+          <button class="add-img" id="btn" ;>Ajouter une photo</button>
+        </div>
+      </section>
+
+      <section class="modal-seconde">
+        <div class="modal-content">
+          <div class="icon-container-seconde">
+            <span class="back-seconde">
+              <i class="fa-solid fa-arrow-left"></i>
+            </span>
+            <span class="close-seconde">&times;</span>
+          </div>
+
+          <h3 class="title-modal">Ajout photo</h3>
+
+          <div class="upload-container">
+            <input type="file" id="file-upload" style="display: none" />
+            <label for="file-upload" class="custom-file-upload">
+              <i class="fa-regular fa-image"></i>
+              <span class="upload-img">+ Ajout photo</span>
+              <span class="infos-upload">jpg, png : 4mo max</span>
+            </label>
+          </div>
+
+          <div class="title-and-catégorie">
+            <div class="cointainer-form-title">
+              <label class="form-title" for="titre">Titre</label>
+              <input type="text" id="titre" name="titre" placeholder="" />
+            </div>
+            <div class="cointainer-form-catégorie">
+              <label class="form-catégorie" for="categorie">Catégorie</label>
+              <select id="categorie" name="categorie">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="container-separation">
+            <div class="separation"></div>
+          </div>
+
+          <button class="valide" id="btn" ;>Valider</button>
+        </div>
+      </section>
+    </div>
+    <!---------------------------------------------------------------------------------->
 
     <section class="contenu-principal">
       <header>
@@ -136,7 +135,6 @@
           </article>
         </section>
 
-		
         <section id="portfolio">
           <div class="title-portfolio">
             <h2>Mes Projets</h2>
