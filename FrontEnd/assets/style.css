@@ -263,7 +263,7 @@ li:hover {
 }
 
 /********************************************** Gallery **********************************************/
-.gallery-container {
+.gallery-container-original {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -271,7 +271,7 @@ li:hover {
   grid-row-gap: 20px;
 }
 
-.gallery-container img {
+.gallery-container-original img {
   width: 100%;
 }
 
