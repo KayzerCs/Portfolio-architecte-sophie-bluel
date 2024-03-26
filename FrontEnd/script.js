@@ -50,7 +50,7 @@ function updateUIBasedOnLogin() {
 document.addEventListener("DOMContentLoaded", function () {
   // Appelle la fonction pour charger les projets depuis l'API
   fetchAndDisplayProjects();
-  // setupModal();
+  setupModal();
   updateUIBasedOnLogin();
 });
 
