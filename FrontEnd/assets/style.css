@@ -148,6 +148,22 @@ section {
   height: 20px;
 }
 
+#btn {
+  font-size: 15px;
+  font-weight: 400;
+  padding: 7px 30px;
+  border: 1px solid #1d6154;
+  background-color: #1d6154;
+  color: white;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 20px;
+}
+#btn:hover {
+  background: #0e2f28;
+}
+
 /********************************************** Header **********************************************/
 h1 {
   display: flex;
@@ -302,4 +318,65 @@ footer nav ul {
   display: flex;
   justify-content: flex-end;
   margin: 2em;
+}
+
+/********************************************** LoginPage **********************************************/
+.body-login-page {
+  height: 90vh;
+}
+
+.main-login-page {
+  margin-top: 100px;
+  height: 65vh;
+}
+
+.title-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 25px;
+}
+
+.login-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 27%;
+}
+
+#loginForm label {
+  margin-bottom: 5px;
+  padding-left: 10px;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+#loginForm input {
+  margin-bottom: 25px;
+  border: none;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.116);
+  height: 40px;
+  width: 300px;
+}
+
+.login-btn {
+  font-family: "Work Sans";
+}
+
+.mdp {
+  margin-top: 25px;
+  border-bottom: 1px solid black;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
 }
