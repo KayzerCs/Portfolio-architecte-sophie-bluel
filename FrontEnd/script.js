@@ -75,15 +75,17 @@ function fetchAndDisplayProjects() {
 // Affiche les projets sous forme de galerie
 function displayProjects(data) {
   // Sélectionne le conteneur de la galerie dans le DOM
-  const galleryContainer = document.getElementById("GalleryContainer");
+  const galleryContainerOriginal = document.getElementById(
+    "GalleryContainerOriginal"
+  );
   // Vide le conteneur de la galerie pour les nouveaux projets
-  galleryContainer.innerHTML = "";
+  galleryContainerOriginal.innerHTML = "";
 
   // Parcourt chaque projet dans les données récupérées
   data.forEach((project) => {
     // Crée et configure un élément 'figure' pour chaque projet
     const figureElement = document.createElement("figure");
-    figureElement.className = "gallery-item";
+    figureElement.className = "gallery-item-original";
     figureElement.dataset.category = project.category.name.toLowerCase();
     figureElement.id = project.id;
 
@@ -102,7 +104,7 @@ function displayProjects(data) {
     figureElement.appendChild(figcaptionElement);
 
     // Ajoute le 'figure' complété au conteneur de la galerie dans le DOM
-    galleryContainer.appendChild(figureElement);
+    galleryContainerOriginal.appendChild(figureElement);
   });
 }
 
@@ -139,7 +141,9 @@ function createFilterButton(filterId, filterName) {
 // Filtre les projets affichés en fonction de l'identifiant de catégorie sélectionné.
 function filterProjects(filterId) {
   // Sélectionne tous les éléments figure dans le conteneur de la galerie.
-  const allProjects = document.querySelectorAll("#GalleryContainer figure");
+  const allProjects = document.querySelectorAll(
+    "#GalleryContainerOriginal figure"
+  );
 
   // Itère sur chaque projet pour déterminer s'il doit être affiché ou masqué.
   allProjects.forEach((project) => {
