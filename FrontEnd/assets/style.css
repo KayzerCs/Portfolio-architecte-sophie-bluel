@@ -129,11 +129,15 @@ table {
 }
 /** end reset css**/
 body {
-  max-width: 1140px;
-  margin: auto;
+  margin: 0;
+  padding: 0;
   font-family: "Work Sans";
   font-size: 14px;
   background-color: #fffef8;
+}
+.contenu-principal {
+  max-width: 1140px;
+  margin: auto;
 }
 header {
   display: flex;
@@ -379,4 +383,27 @@ footer nav ul {
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
+}
+
+/********************************************** Bannière Mode Édition **********************************************/
+
+.edition-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  height: 50px;
+  width: 100%;
+  color: white;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-container i {
+  margin-right: 10px;
 }
