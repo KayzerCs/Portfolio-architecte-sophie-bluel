@@ -71,6 +71,7 @@ function fetchAndDisplayProjects() {
     );
 }
 
+// Affiche les projets sous forme de galerie 
 function displayProjects(data) {
   // Sélectionne le conteneur de la galerie dans le DOM
   const galleryContainer = document.getElementById("GalleryContainer");
