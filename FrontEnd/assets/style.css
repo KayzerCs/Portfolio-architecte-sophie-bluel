@@ -386,6 +386,27 @@ footer nav ul {
   cursor: pointer;
 }
 
+/********************************************** Message erreur **********************************************/
+
+.error-message {
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ffa0a0;
+  background-color: #ffdede;
+  color: black;
+  border-radius: 5px;
+  text-align: left;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+.error-message::before {
+  padding-right: 5px;
+  font-weight: bold;
+}
+
 /********************************************** Bannière Mode Édition **********************************************/
 
 .edition-container {
