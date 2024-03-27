@@ -4,9 +4,8 @@ const loginButton = document.getElementById("loginButton");
 const editionContainer = document.getElementById("editionContainer");
 const IconPortfolio = document.querySelector(".icon-portfolio");
 
-
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
-function updateUIBasedOnLogin() { 
+function updateUIBasedOnLogin() {
   // // Récupère l'état de connexion depuis LocalStorage
   let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
@@ -48,8 +47,7 @@ function updateUIBasedOnLogin() {
   });
 }
 
-
-//******* Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code 
+//******* Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
 document.addEventListener("DOMContentLoaded", function () {
   // Appelle la fonction pour charger les projets depuis l'API
   fetchAndDisplayProjects();
@@ -57,8 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
   updateUIBasedOnLogin();
 });
 
-
-//******* Fonction pour charger les projets et les catégories depuis l'API et les afficher 
+//******* Fonction pour charger les projets et les catégories depuis l'API et les afficher
 function fetchAndDisplayProjects() {
   fetch(baseURL + "works")
     .then((response) => response.json()) // Convertit la réponse en JSON
@@ -79,8 +76,7 @@ function fetchAndDisplayProjects() {
     );
 }
 
-
-//******* Fonction principale pour afficher les projets dans les galeries. 
+//******* Fonction principale pour afficher les projets dans les galeries.
 function displayProjects(data) {
   // Sélection des conteneurs des galeries dans le DOM par leurs identifiants
   const galleryContainerOriginal = document.getElementById(
@@ -114,8 +110,7 @@ function displayProjects(data) {
   });
 }
 
-
-//******* Fonction pour créer un élément de galerie (figure) basé sur un projet. 
+//******* Fonction pour créer un élément de galerie (figure) basé sur un projet.
 function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
@@ -160,7 +155,6 @@ function createGalleryItem(project, className, isModal) {
   return figureElement;
 }
 
-
 //******* Affiche les boutons de filtrage des projets selon les catégories fournies.
 function displayFilterButtons(categories) {
   filterContainer.innerHTML = "";
@@ -176,8 +170,7 @@ function displayFilterButtons(categories) {
   });
 }
 
-
-//******* Crée un bouton de filtre. 
+//******* Crée un bouton de filtre.
 function createFilterButton(filterId, filterName) {
   // Crée l'élément bouton et définit son texte et sa classe.
   const button = document.createElement("button");
@@ -191,7 +184,6 @@ function createFilterButton(filterId, filterName) {
   button.addEventListener("click", () => filterProjects(filterId));
   return button;
 }
-
 
 //******* Filtre les projets affichés en fonction de l'identifiant de catégorie sélectionné.
 function filterProjects(filterId) {
@@ -208,7 +200,6 @@ function filterProjects(filterId) {
       filterId === "all" || project.dataset.category === filterId ? "" : "none";
   });
 }
-
 
 //******* Configurer et gérer le comportement d'une fenêtre modale dans votre interface utilisateur
 function setupModal() {
@@ -264,3 +255,60 @@ function setupModal() {
     });
   }
 }
+
+// Fonction pour supprimer un projet de l'API et du DOM
+function deleteProject(projectId) {
+  const token = localStorage.getItem("token");
+
+  fetch(`http://localhost:5678/api/works/${projectId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`, // Incluez le token dans la requête
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("La suppression du projet a échoué.");
+      }
+      return response.json();
+    })
+    .then(() => {
+      console.log("Projet supprimé avec succès de L API");
+      // Suppression du projet du DOM après confirmation de la suppression de l'API
+      removeProjectFromDOM(projectId);
+    })
+    .catch((error) =>
+      console.error("Erreur lors de la suppression du projet:", error)
+    );
+}
+
+function removeProjectFromDOM(projectId) {
+  // Suppression du projet des deux conteneurs
+  document
+    .querySelectorAll(`.project[data-id="${projectId}"]`)
+    .forEach((project) => {
+      project.remove();
+    });
+}
+
+// Utilisation de la délégation d'événements pour gérer les clics sur les boutons de suppression
+// dans les deux conteneurs de projets
+document
+  .querySelectorAll("#GalleryContainerModal, #GalleryContainerOriginal")
+  .forEach((container) => {
+    container.addEventListener("click", function (event) {
+      const deleteBtn = event.target.closest(".delete-btn");
+      if (deleteBtn) {
+        const projectElement = deleteBtn.closest(".gallery-item-modal");
+        // Ajoutez une vérification pour vous assurer que projectElement n'est pas null
+        if (projectElement && projectElement.id) {
+          const projectId = projectElement.id;
+          deleteProject(projectId);
+        } else {
+          console.error(
+            "Impossible de trouver l'élément .project ou l'élément .project n'a pas d'ID"
+          );
+        }
+      }
+    });
+  });
