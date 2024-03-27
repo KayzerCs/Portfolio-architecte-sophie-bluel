@@ -473,7 +473,7 @@ footer nav ul {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
-  border-radius: 25px;
+  border-radius: 10px;
   width: 25%;
   text-align: center;
 }
@@ -499,14 +499,13 @@ footer nav ul {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
-  padding: 30px 60px;
+  padding: 30px 30px;
 }
 
 .gallery-item-modal {
   position: relative;
-  display: block;
-  width: 70px;
-  height: 100px;
+  width: 100%;
+  height: auto;
 }
 
 .gallery-item-modal img {
@@ -532,6 +531,7 @@ footer nav ul {
   align-items: center;
   justify-content: center;
   font-size: 13px;
+  font-weight: normal;
 }
 
 .container-separation {
@@ -543,11 +543,11 @@ footer nav ul {
 }
 .separation {
   border-top: 2px solid #e3e3e3;
-  width: 75%;
+  width: 85%;
 }
 
 .add-img {
-  width: 250px;
+  width: 50%;
 }
 
 /********************************************** Modal Part 2 **********************************************/
