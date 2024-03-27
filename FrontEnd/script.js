@@ -221,21 +221,24 @@ function setupModal() {
     modal.style.display = "none";
   });
 
+  // Sélectionne le bouton "Ajouter une photo" par son id et attache un gestionnaire d'événements de clic.
+  const addPhotoBtn = document.querySelector(".add-img");
+  addPhotoBtn.addEventListener("click", () => {
+    // Sélectionne la première modal par son identifiant et la cache.
+    const firstModal = document.querySelector(".modal-original"); // Assurez-vous que c'est le bon ID
+    firstModal.style.display = "none";
+
+    // Sélectionne la seconde modal par son identifiant et l'affiche.
+    const secondModal = document.querySelector(".modal-seconde"); // Assurez-vous que c'est le bon ID
+    secondModal.style.display = "block";
+  });
+
   // Sélectionne un second bouton de fermeture dans la modale et réalise la même action que le premier
   // bouton de fermeture pour cacher la modale lors du clic.
   const closeModalSeconde = document.querySelector(".modal .close-seconde");
   closeModalSeconde.addEventListener("click", () => {
     const modal = document.getElementById("myModal");
     modal.style.display = "none";
-  });
-
-  // Ajoute un gestionnaire d'événements au niveau de la fenêtre pour fermer la modale si l'utilisateur
-  // clique à l'extérieur de celle-ci (c'est-à-dire sur le fond).
-  window.addEventListener("click", (event) => {
-    const modal = document.getElementById("myModal");
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
   });
 
   // Sélectionne un bouton pour revenir au contenu original de la modale depuis un second contenu.
