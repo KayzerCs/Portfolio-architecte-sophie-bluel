@@ -4,7 +4,9 @@ const loginButton = document.getElementById("loginButton");
 const editionContainer = document.getElementById("editionContainer");
 const IconPortfolio = document.querySelector(".icon-portfolio");
 
-function updateUIBasedOnLogin() {
+
+//******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
+function updateUIBasedOnLogin() { 
   // // Récupère l'état de connexion depuis LocalStorage
   let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
@@ -46,7 +48,8 @@ function updateUIBasedOnLogin() {
   });
 }
 
-// Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
+
+//******* Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code 
 document.addEventListener("DOMContentLoaded", function () {
   // Appelle la fonction pour charger les projets depuis l'API
   fetchAndDisplayProjects();
@@ -54,7 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
   updateUIBasedOnLogin();
 });
 
-// Fonction pour charger les projets et les catégories depuis l'API et les afficher
+
+//******* Fonction pour charger les projets et les catégories depuis l'API et les afficher 
 function fetchAndDisplayProjects() {
   fetch(baseURL + "works")
     .then((response) => response.json()) // Convertit la réponse en JSON
@@ -75,43 +79,89 @@ function fetchAndDisplayProjects() {
     );
 }
 
-// Affiche les projets sous forme de galerie
+
+//******* Fonction principale pour afficher les projets dans les galeries. 
 function displayProjects(data) {
-  // Sélectionne le conteneur de la galerie dans le DOM
+  // Sélection des conteneurs des galeries dans le DOM par leurs identifiants
   const galleryContainerOriginal = document.getElementById(
     "GalleryContainerOriginal"
   );
-  // Vide le conteneur de la galerie pour les nouveaux projets
+  const galleryContainerModal = document.getElementById(
+    "GalleryContainerModal"
+  );
+
+  // Nettoyage des conteneurs pour s'assurer qu'ils sont vides avant d'ajouter les nouveaux éléments
   galleryContainerOriginal.innerHTML = "";
+  galleryContainerModal.innerHTML = "";
 
-  // Parcourt chaque projet dans les données récupérées
+  // Boucle sur chaque projet fourni dans les données
   data.forEach((project) => {
-    // Crée et configure un élément 'figure' pour chaque projet
-    const figureElement = document.createElement("figure");
-    figureElement.className = "gallery-item-original";
-    figureElement.dataset.category = project.category.name.toLowerCase();
-    figureElement.id = project.id;
+    // Création d'un élément pour la galerie originale et ajout au conteneur correspondant
+    const figureElementOriginal = createGalleryItem(
+      project,
+      "gallery-item-original",
+      false
+    );
+    galleryContainerOriginal.appendChild(figureElementOriginal);
 
-    // Crée et configure un élément 'img' pour l'image du proje
-    const imageElement = document.createElement("img");
-    imageElement.src = project.imageUrl;
-    imageElement.alt = project.title;
-    imageElement.title = project.title; // Le titre s'affiche au survol de l'image
-
-    // Crée et configure un élément 'figcaption' pour le titre du projet
-    const figcaptionElement = document.createElement("figcaption");
-    figcaptionElement.textContent = project.title;
-
-    // Ajoute 'img' et 'figcaption' à 'figure'
-    figureElement.appendChild(imageElement);
-    figureElement.appendChild(figcaptionElement);
-
-    // Ajoute le 'figure' complété au conteneur de la galerie dans le DOM
-    galleryContainerOriginal.appendChild(figureElement);
+    // Création d'un élément pour la galerie modale et ajout au conteneur correspondant
+    const figureElementModal = createGalleryItem(
+      project,
+      "gallery-item-modal",
+      true
+    );
+    galleryContainerModal.appendChild(figureElementModal);
   });
 }
 
-// Affiche les boutons de filtrage des projets selon les catégories fournies.
+
+//******* Fonction pour créer un élément de galerie (figure) basé sur un projet. 
+function createGalleryItem(project, className, isModal) {
+  // Création d'un élément 'figure' et configuration de ses propriétés
+  const figureElement = document.createElement("figure");
+  figureElement.className = className; // Classe CSS pour styliser l'élément
+  figureElement.dataset.category = project.category.name.toLowerCase(); // Catégorie du projet pour éventuels filtres
+  figureElement.id = project.id; // Identifiant unique du projet
+
+  // Création et configuration de l'élément 'img' pour l'image du projet
+  const imageElement = document.createElement("img");
+  imageElement.src = project.imageUrl; // Source de l'image
+  imageElement.alt = project.title; // Texte alternatif pour l'accessibilité
+  imageElement.title = project.title; // Titre affiché au survol pour l'info-bulle
+
+  // Ajout de l'image au 'figure'
+  figureElement.appendChild(imageElement);
+
+  if (isModal) {
+    // Pour la galerie modale, ajout d'un bouton qui contiendra l'icône de corbeille pour la suppression
+    const button = document.createElement("button");
+    button.className = "delete-btn";
+    button.setAttribute("type", "button"); // Bonne pratique pour les boutons dans les formulaires
+
+    // Création de l'icône de corbeille et ajout au bouton
+    const deleteIcon = document.createElement("i");
+    deleteIcon.className = "fa-solid fa-trash-can"; // Classe FontAwesome pour l'icône
+    deleteIcon.onclick = function () {
+      // Fonction appelée lors du clic sur l'icône, pour la suppression du projet
+      console.log(`Supprimer le projet: ${project.id}`);
+    };
+
+    // Ajout de l'icône au bouton, puis du bouton à l'élément 'figure'
+    button.appendChild(deleteIcon);
+    figureElement.appendChild(button);
+  } else {
+    // Pour la galerie originale, ajout d'une légende avec le titre du projet
+    const figcaptionElement = document.createElement("figcaption");
+    figcaptionElement.textContent = project.title;
+    figureElement.appendChild(figcaptionElement);
+  }
+
+  // Retourne l'élément 'figure' complété pour être ajouté au DOM
+  return figureElement;
+}
+
+
+//******* Affiche les boutons de filtrage des projets selon les catégories fournies.
 function displayFilterButtons(categories) {
   filterContainer.innerHTML = "";
 
@@ -126,7 +176,8 @@ function displayFilterButtons(categories) {
   });
 }
 
-// Crée un bouton de filtre.
+
+//******* Crée un bouton de filtre. 
 function createFilterButton(filterId, filterName) {
   // Crée l'élément bouton et définit son texte et sa classe.
   const button = document.createElement("button");
@@ -141,7 +192,8 @@ function createFilterButton(filterId, filterName) {
   return button;
 }
 
-// Filtre les projets affichés en fonction de l'identifiant de catégorie sélectionné.
+
+//******* Filtre les projets affichés en fonction de l'identifiant de catégorie sélectionné.
 function filterProjects(filterId) {
   // Sélectionne tous les éléments figure dans le conteneur de la galerie.
   const allProjects = document.querySelectorAll(
@@ -157,6 +209,8 @@ function filterProjects(filterId) {
   });
 }
 
+
+//******* Configurer et gérer le comportement d'une fenêtre modale dans votre interface utilisateur
 function setupModal() {
   // Sélectionne tous les éléments avec la classe .icon et attache un gestionnaire d'événements de clic
   // pour ouvrir la modale identifiée par l'ID "myModal".
