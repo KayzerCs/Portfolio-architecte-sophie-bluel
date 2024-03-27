@@ -221,21 +221,24 @@ function setupModal() {
     modal.style.display = "none";
   });
 
+  // Sélectionne le bouton "Ajouter une photo" par son id et attache un gestionnaire d'événements de clic.
+  const addPhotoBtn = document.querySelector(".add-img");
+  addPhotoBtn.addEventListener("click", () => {
+    // Sélectionne la première modal par son identifiant et la cache.
+    const firstModal = document.querySelector(".modal-original"); // Assurez-vous que c'est le bon ID
+    firstModal.style.display = "none";
+
+    // Sélectionne la seconde modal par son identifiant et l'affiche.
+    const secondModal = document.querySelector(".modal-seconde"); // Assurez-vous que c'est le bon ID
+    secondModal.style.display = "block";
+  });
+
   // Sélectionne un second bouton de fermeture dans la modale et réalise la même action que le premier
   // bouton de fermeture pour cacher la modale lors du clic.
   const closeModalSeconde = document.querySelector(".modal .close-seconde");
   closeModalSeconde.addEventListener("click", () => {
     const modal = document.getElementById("myModal");
     modal.style.display = "none";
-  });
-
-  // Ajoute un gestionnaire d'événements au niveau de la fenêtre pour fermer la modale si l'utilisateur
-  // clique à l'extérieur de celle-ci (c'est-à-dire sur le fond).
-  window.addEventListener("click", (event) => {
-    const modal = document.getElementById("myModal");
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
   });
 
   // Sélectionne un bouton pour revenir au contenu original de la modale depuis un second contenu.
@@ -256,57 +259,79 @@ function setupModal() {
   }
 }
 
-// Fonction pour supprimer un projet de l'API et du DOM
+//******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
 function deleteProject(projectId) {
+  // Récupère le token d'authentification stocké dans le localStorage du navigateur.
   const token = localStorage.getItem("token");
 
+  // Effectue une requête HTTP DELETE vers l'API pour supprimer le projet spécifié par projectId.
   fetch(`http://localhost:5678/api/works/${projectId}`, {
-    method: "DELETE",
+    method: "DELETE", // Spécifie la méthode HTTP DELETE pour la requête.
     headers: {
-      Authorization: `Bearer ${token}`, // Incluez le token dans la requête
+      // Inclut le token d'authentification dans les en-têtes de la requête,
+      // formaté comme un Bearer token.
+      Authorization: `Bearer ${token}`,
     },
   })
     .then((response) => {
+      // Première fonction de rappel .then : vérifie la réponse de l'API.
       if (!response.ok) {
+        // Si la réponse n'est pas OK (par exemple, status 200), lance une exception.
         throw new Error("La suppression du projet a échoué.");
       }
+      // Si la réponse est OK, parse le corps de la réponse comme JSON.
+      // Cela est souvent une formalité avec des APIs REST, même si le contenu n'est pas toujours utile après une suppression.
       return response.json();
     })
     .then(() => {
-      console.log("Projet supprimé avec succès de L API");
-      // Suppression du projet du DOM après confirmation de la suppression de l'API
+      // Deuxième fonction de rappel .then : exécutée après la résolution de response.json().
+      console.log("Projet supprimé avec succès de l'API");
+      // Appelle la fonction removeProjectFromDOM avec l'ID du projet,
+      // pour le supprimer également de l'interface utilisateur.
       removeProjectFromDOM(projectId);
     })
-    .catch((error) =>
-      console.error("Erreur lors de la suppression du projet:", error)
-    );
+    .catch((error) => {
+      // Fonction de rappel .catch pour attraper les erreurs survenues dans la chaîne de promesses.
+      // Ceci inclut les erreurs lancées manuellement dans le premier .then ainsi que les erreurs de réseau.
+      console.error("Erreur lors de la suppression du projet:", error);
+    });
 }
 
+//******* Fonction pour supprimer un projet du DOM en utilisant son ID de projet.
 function removeProjectFromDOM(projectId) {
-  // Suppression du projet des deux conteneurs
+  // Sélectionne tous les éléments dans le DOM qui ont une classe `.project` et un attribut `data-id` correspondant à l'ID du projet passé en argument.
   document
     .querySelectorAll(`.project[data-id="${projectId}"]`)
     .forEach((project) => {
+      // Pour chaque élément de projet trouvé, utilise la méthode `.remove()`
+      // pour le supprimer du DOM. Cela retire effectivement l'élément de la page,
+      // rendant la suppression du projet visuellement immédiate pour l'utilisateur.
       project.remove();
     });
 }
 
-// Utilisation de la délégation d'événements pour gérer les clics sur les boutons de suppression
-// dans les deux conteneurs de projets
+//******* Attache un écouteur d'événements de clic aux conteneurs spécifiés. Cela permet de capturer
+//******* les clics sur les boutons de suppression sans avoir besoin d'attacher des écouteurs d'événements individuellement à chaque bouton.
 document
   .querySelectorAll("#GalleryContainerModal, #GalleryContainerOriginal")
   .forEach((container) => {
     container.addEventListener("click", function (event) {
+      // Utilise event.target pour trouver le bouton de suppression le plus proche du clic.
+      // Si un tel bouton est trouvé, cela signifie que l'utilisateur a cliqué sur un bouton de suppression.
       const deleteBtn = event.target.closest(".delete-btn");
       if (deleteBtn) {
+        // Vérifie si le clic était sur un bouton de suppression.
+        // Trouve l'élément du projet le plus proche à partir du bouton de suppression.
+        // Cela permet de s'assurer que l'action de suppression est liée à l'élément correct.
         const projectElement = deleteBtn.closest(".gallery-item-modal");
-        // Ajoutez une vérification pour vous assurer que projectElement n'est pas null
         if (projectElement && projectElement.id) {
-          const projectId = projectElement.id;
-          deleteProject(projectId);
+          // Vérifie si l'élément du projet et son ID existent.
+          // Appelle la fonction deleteProject avec l'ID de l'élément du projet pour effectuer la suppression.
+          deleteProject(projectElement.id);
         } else {
+          // Affiche un message d'erreur si l'élément du projet ciblé n'a pas d'ID valide.
           console.error(
-            "Impossible de trouver l'élément .project ou l'élément .project n'a pas d'ID"
+            "Impossible de trouver l'élément projet avec un ID valide."
           );
         }
       }
