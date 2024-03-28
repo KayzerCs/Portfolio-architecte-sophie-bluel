@@ -3,6 +3,9 @@ const filterContainer = document.getElementById("FiltersContainer");
 const loginButton = document.getElementById("loginButton");
 const editionContainer = document.getElementById("editionContainer");
 const IconPortfolio = document.querySelector(".icon-portfolio");
+const selectImage = document.querySelector(".upload-img");
+const inputFile = document.querySelector("#file");
+const imgArea = document.querySelector(".img-area");
 
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
@@ -257,6 +260,100 @@ function setupModal() {
       }
     });
   }
+
+  // Lance une requête à l'API pour récupérer les catégories.
+  fetch(baseURL + `categories`)
+    // Lorsque la requête est effectuée, `.then()` reçoit la réponse.
+    .then((response) => {
+      // Vérifie si le statut de la réponse n'indique pas un succès (par exemple, erreur 404 ou 500).
+      if (!response.ok) {
+        // Lance une erreur si la réponse est erronée, ce qui stoppe l'exécution normale et passe au `.catch()`.
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      // Si la réponse est OK, convertit le corps de la réponse en JSON.
+      return response.json();
+    })
+    // Une fois la réponse convertie en JSON, cette partie du code est exécutée.
+    .then((data) => {
+      // Sélectionne l'élément HTML 'select' par son ID 'categorie'.
+      const select = document.querySelector("#categorie");
+      // Vide l'élément 'select' pour s'assurer qu'il n'y a pas d'options précédentes.
+      select.innerHTML = "";
+
+      // Itère sur chaque catégorie reçue dans les données JSON.
+      data.forEach((categorie) => {
+        // Crée un nouvel élément 'option'.
+        let option = document.createElement("option");
+        // Attribue l'ID de la catégorie comme valeur de l'option pour l'utiliser plus tard.
+        option.value = categorie.id;
+        // Met le nom de la catégorie comme texte visible dans l'option.
+        option.textContent = categorie.name;
+        // Ajoute l'option créée au 'select'.
+        select.appendChild(option);
+      });
+    })
+    // En cas d'erreur à n'importe quelle étape ci-dessus, le code dans `.catch()` est exécuté.
+    .catch((error) => {
+      // Affiche l'erreur dans la console du navigateur.
+      console.error("Could not load categories:", error);
+    });
+
+  // Écouteur d'événement sur selectImage pour déclencher la sélection de fichier
+  selectImage.addEventListener("click", function () {
+    inputFile.click();
+  });
+
+  // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
+  // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
+  function handleFileChange() {
+    // Récupère le premier fichier sélectionné par l'utilisateur
+    const image = inputFile.files[0];
+
+    // Vérifie si un fichier a été sélectionné
+    if (image) {
+      // Crée un nouvel objet FileReader pour lire le contenu du fichier
+      const reader = new FileReader();
+
+      // Définit ce qui doit se passer une fois que le fichier est lu
+      reader.onload = () => {
+        // Recherche une image existante dans imgArea et la supprime si elle existe
+        // Cela assure que seulement une image est affichée à la fois
+        const existingImg = imgArea.querySelector("img");
+        if (existingImg) {
+          imgArea.removeChild(existingImg);
+        }
+
+        // Crée une nouvelle balise <img> et définit son URL source avec le résultat de FileReader
+        const imgUrl = reader.result;
+        const img = document.createElement("img");
+        img.src = imgUrl;
+
+        // Ajoute une classe à l'image pour identification facile et application de styles CSS
+        img.classList.add("changeable-image");
+
+        // Ajoute l'image nouvellement créée au conteneur imgArea pour l'afficher sur la page
+        imgArea.appendChild(img);
+      };
+
+      // Commence la lecture du fichier sélectionné et convertit le fichier en Data URL
+      // Une Data URL est une chaîne de caractères qui représente le fichier, permettant son affichage comme source d'image
+      reader.readAsDataURL(image);
+    }
+  }
+
+  // Ajoute un écouteur d'événement sur inputFile pour détecter quand un utilisateur sélectionne un fichier
+  inputFile.addEventListener("change", handleFileChange);
+
+  // Ajoute un écouteur d'événements sur imgArea pour gérer les clics sur les images à l'intérieur
+  // Cela permet de redéclencher la sélection de fichier quand l'utilisateur clique sur l'image affichée
+  imgArea.addEventListener("click", function (event) {
+    // Vérifie si l'élément cliqué a la classe "changeable-image"
+    if (event.target.classList.contains("changeable-image")) {
+      // Si oui, cela signifie que l'utilisateur a cliqué sur l'image
+      // Déclenche alors un clic sur inputFile pour ouvrir la boîte de dialogue de sélection de fichier
+      inputFile.click();
+    }
+  });
 }
 
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.

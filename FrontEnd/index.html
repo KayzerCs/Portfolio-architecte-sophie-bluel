@@ -58,12 +58,13 @@
           <h3 class="title-modal">Ajout photo</h3>
 
           <div class="upload-container">
-            <input type="file" id="file-upload" style="display: none" />
-            <label for="file-upload" class="custom-file-upload">
+            <input type="file" id="file" accept="image/*" hidden />
+
+            <div class="img-area" data-img="">
               <i class="fa-regular fa-image"></i>
               <span class="upload-img">+ Ajout photo</span>
               <span class="infos-upload">jpg, png : 4mo max</span>
-            </label>
+            </div>
           </div>
 
           <div class="title-and-catégorie">
@@ -148,7 +149,10 @@
             </div>
           </div>
           <div class="filters-container" id="FiltersContainer"></div>
-          <div class="gallery-container-original" id="GalleryContainerOriginal"></div>
+          <div
+            class="gallery-container-original"
+            id="GalleryContainerOriginal"
+          ></div>
         </section>
 
         <section id="contact">
