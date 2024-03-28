@@ -257,6 +257,43 @@ function setupModal() {
       }
     });
   }
+
+  // Lance une requête à l'API pour récupérer les catégories.
+  fetch(baseURL + `categories`)
+    // Lorsque la requête est effectuée, `.then()` reçoit la réponse.
+    .then((response) => {
+      // Vérifie si le statut de la réponse n'indique pas un succès (par exemple, erreur 404 ou 500).
+      if (!response.ok) {
+        // Lance une erreur si la réponse est erronée, ce qui stoppe l'exécution normale et passe au `.catch()`.
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      // Si la réponse est OK, convertit le corps de la réponse en JSON.
+      return response.json();
+    })
+    // Une fois la réponse convertie en JSON, cette partie du code est exécutée.
+    .then((data) => {
+      // Sélectionne l'élément HTML 'select' par son ID 'categorie'.
+      const select = document.querySelector("#categorie");
+      // Vide l'élément 'select' pour s'assurer qu'il n'y a pas d'options précédentes.
+      select.innerHTML = "";
+
+      // Itère sur chaque catégorie reçue dans les données JSON.
+      data.forEach((categorie) => {
+        // Crée un nouvel élément 'option'.
+        let option = document.createElement("option");
+        // Attribue l'ID de la catégorie comme valeur de l'option pour l'utiliser plus tard.
+        option.value = categorie.id;
+        // Met le nom de la catégorie comme texte visible dans l'option.
+        option.textContent = categorie.name;
+        // Ajoute l'option créée au 'select'.
+        select.appendChild(option);
+      });
+    })
+    // En cas d'erreur à n'importe quelle étape ci-dessus, le code dans `.catch()` est exécuté.
+    .catch((error) => {
+      // Affiche l'erreur dans la console du navigateur.
+      console.error("Could not load categories:", error);
+    });
 }
 
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
