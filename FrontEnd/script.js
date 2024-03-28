@@ -3,6 +3,9 @@ const filterContainer = document.getElementById("FiltersContainer");
 const loginButton = document.getElementById("loginButton");
 const editionContainer = document.getElementById("editionContainer");
 const IconPortfolio = document.querySelector(".icon-portfolio");
+const selectImage = document.querySelector(".upload-img");
+const inputFile = document.querySelector("#file");
+const imgArea = document.querySelector(".img-area");
 
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
@@ -294,6 +297,48 @@ function setupModal() {
       // Affiche l'erreur dans la console du navigateur.
       console.error("Could not load categories:", error);
     });
+
+
+  // Prévisualiser l'image selectionner dans l'input  
+  // Ajouter un écouteur d'événements au clic sur selectImage pour déclencher un clic sur inputFile
+  selectImage.addEventListener("click", function () {
+    inputFile.click(); // Simule un clic sur l'élément input réel
+  });
+
+  // Ajouter un écouteur d'événements pour détecter quand un fichier est sélectionné
+  inputFile.addEventListener("change", function () {
+    // Récupérer le premier fichier sélectionné par l'utilisateur
+    const image = this.files[0];
+
+    // Afficher dans la console le fichier sélectionné (utile pour le débogage)
+    console.log(image);
+
+    // Créer une instance de FileReader pour lire le fichier sélectionné
+    const reader = new FileReader();
+
+    // Définir ce qui se passe une fois que le FileReader a terminé de lire le fichier
+    reader.onload = () => {
+      // Supprimer toutes les images précédentes dans imgArea
+      const allImg = imgArea.querySelectorAll("img");
+      allImg.forEach((item) => item.remove());
+
+      // Récupérer l'URL de l'image lue par le FileReader
+      const imgUrl = reader.result;
+
+      // Créer un nouvel élément img et définir son attribut src avec l'URL de l'image
+      const img = document.createElement("img");
+      img.src = imgUrl;
+
+      // Ajouter l'élément img au conteneur imgArea pour afficher l'image
+      imgArea.appendChild(img);
+
+      // Ajouter une classe 'active' à imgArea (peut être utilisé pour le styling CSS)
+      imgArea.classList.add("active");
+    };
+
+    // Lire le fichier sélectionné et déclencher l'événement onload une fois la lecture terminée
+    reader.readAsDataURL(image);
+  });
 }
 
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
