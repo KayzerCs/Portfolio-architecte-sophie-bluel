@@ -298,46 +298,61 @@ function setupModal() {
       console.error("Could not load categories:", error);
     });
 
-
-  // Prévisualiser l'image selectionner dans l'input  
-  // Ajouter un écouteur d'événements au clic sur selectImage pour déclencher un clic sur inputFile
+  // Écouteur d'événement sur selectImage pour déclencher la sélection de fichier
   selectImage.addEventListener("click", function () {
-    inputFile.click(); // Simule un clic sur l'élément input réel
+    inputFile.click();
   });
 
-  // Ajouter un écouteur d'événements pour détecter quand un fichier est sélectionné
-  inputFile.addEventListener("change", function () {
-    // Récupérer le premier fichier sélectionné par l'utilisateur
-    const image = this.files[0];
+  // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
+  // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
+  function handleFileChange() {
+    // Récupère le premier fichier sélectionné par l'utilisateur
+    const image = inputFile.files[0];
 
-    // Afficher dans la console le fichier sélectionné (utile pour le débogage)
-    console.log(image);
+    // Vérifie si un fichier a été sélectionné
+    if (image) {
+      // Crée un nouvel objet FileReader pour lire le contenu du fichier
+      const reader = new FileReader();
 
-    // Créer une instance de FileReader pour lire le fichier sélectionné
-    const reader = new FileReader();
+      // Définit ce qui doit se passer une fois que le fichier est lu
+      reader.onload = () => {
+        // Recherche une image existante dans imgArea et la supprime si elle existe
+        // Cela assure que seulement une image est affichée à la fois
+        const existingImg = imgArea.querySelector("img");
+        if (existingImg) {
+          imgArea.removeChild(existingImg);
+        }
 
-    // Définir ce qui se passe une fois que le FileReader a terminé de lire le fichier
-    reader.onload = () => {
-      // Supprimer toutes les images précédentes dans imgArea
-      const allImg = imgArea.querySelectorAll("img");
-      allImg.forEach((item) => item.remove());
+        // Crée une nouvelle balise <img> et définit son URL source avec le résultat de FileReader
+        const imgUrl = reader.result;
+        const img = document.createElement("img");
+        img.src = imgUrl;
 
-      // Récupérer l'URL de l'image lue par le FileReader
-      const imgUrl = reader.result;
+        // Ajoute une classe à l'image pour identification facile et application de styles CSS
+        img.classList.add("changeable-image");
 
-      // Créer un nouvel élément img et définir son attribut src avec l'URL de l'image
-      const img = document.createElement("img");
-      img.src = imgUrl;
+        // Ajoute l'image nouvellement créée au conteneur imgArea pour l'afficher sur la page
+        imgArea.appendChild(img);
+      };
 
-      // Ajouter l'élément img au conteneur imgArea pour afficher l'image
-      imgArea.appendChild(img);
+      // Commence la lecture du fichier sélectionné et convertit le fichier en Data URL
+      // Une Data URL est une chaîne de caractères qui représente le fichier, permettant son affichage comme source d'image
+      reader.readAsDataURL(image);
+    }
+  }
 
-      // Ajouter une classe 'active' à imgArea (peut être utilisé pour le styling CSS)
-      imgArea.classList.add("active");
-    };
+  // Ajoute un écouteur d'événement sur inputFile pour détecter quand un utilisateur sélectionne un fichier
+  inputFile.addEventListener("change", handleFileChange);
 
-    // Lire le fichier sélectionné et déclencher l'événement onload une fois la lecture terminée
-    reader.readAsDataURL(image);
+  // Ajoute un écouteur d'événements sur imgArea pour gérer les clics sur les images à l'intérieur
+  // Cela permet de redéclencher la sélection de fichier quand l'utilisateur clique sur l'image affichée
+  imgArea.addEventListener("click", function (event) {
+    // Vérifie si l'élément cliqué a la classe "changeable-image"
+    if (event.target.classList.contains("changeable-image")) {
+      // Si oui, cela signifie que l'utilisateur a cliqué sur l'image
+      // Déclenche alors un clic sur inputFile pour ouvrir la boîte de dialogue de sélection de fichier
+      inputFile.click();
+    }
   });
 }
 
