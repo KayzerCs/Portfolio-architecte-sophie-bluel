@@ -485,6 +485,7 @@ footer nav ul {
   border-radius: 10px;
   width: 25%;
   text-align: center;
+  min-width: 360px;
 }
 
 .title-modal {
@@ -651,7 +652,6 @@ footer nav ul {
 }
 
 .fa-image {
-  margin-top: 15px;
   font-size: 60px;
   color: #b9c5cc;
 }
@@ -667,7 +667,7 @@ footer nav ul {
   font-weight: 550;
   border-radius: 25px;
   width: 45%;
-  height: 35px;
+  height: 27px;
   cursor: pointer;
 }
 
