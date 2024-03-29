@@ -502,6 +502,10 @@ footer nav ul {
   float: right;
   font-size: 28px;
   cursor: pointer;
+  transition: transform 0.5s ease;
+}
+.close-original:hover {
+  transform: scale(1.3);
 }
 
 .gallery-container-modal {
@@ -575,11 +579,19 @@ footer nav ul {
   color: #000000;
   font-size: 28px;
   cursor: pointer;
+  transition: transform 0.5s ease;
+}
+.close-seconde:hover {
+  transform: scale(1.3);
 }
 
 .fa-arrow-left {
   font-size: 20px;
   cursor: pointer;
+  transition: transform 0.5s ease;
+}
+.fa-arrow-left:hover {
+  transform: scale(1.3);
 }
 
 /*----------- Upload IMG -----------*/
