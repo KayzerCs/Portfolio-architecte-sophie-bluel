@@ -263,7 +263,7 @@ li:hover {
 }
 
 /********************************************** Gallery **********************************************/
-.gallery-container {
+.gallery-container-original {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -271,7 +271,7 @@ li:hover {
   grid-row-gap: 20px;
 }
 
-.gallery-container img {
+.gallery-container-original img {
   width: 100%;
 }
 
@@ -386,6 +386,27 @@ footer nav ul {
   cursor: pointer;
 }
 
+/********************************************** Message erreur **********************************************/
+
+.error-message {
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ffa0a0;
+  background-color: #ffdede;
+  color: black;
+  border-radius: 5px;
+  text-align: left;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+.error-message::before {
+  padding-right: 5px;
+  font-weight: bold;
+}
+
 /********************************************** Bannière Mode Édition **********************************************/
 
 .edition-container {
@@ -452,7 +473,7 @@ footer nav ul {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
-  border-radius: 25px;
+  border-radius: 10px;
   width: 25%;
   text-align: center;
 }
@@ -474,21 +495,20 @@ footer nav ul {
   cursor: pointer;
 }
 
-.gallery-container {
+.gallery-container-modal {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
-  padding: 30px 60px;
+  padding: 30px 30px;
 }
 
-.gallery-item {
+.gallery-item-modal {
   position: relative;
-  display: block;
-  width: 70px;
-  height: 100px;
+  width: 100%;
+  height: auto;
 }
 
-.gallery-item img {
+.gallery-item-modal img {
   width: 100%;
   height: auto;
 }
@@ -511,6 +531,7 @@ footer nav ul {
   align-items: center;
   justify-content: center;
   font-size: 13px;
+  font-weight: normal;
 }
 
 .container-separation {
@@ -522,11 +543,11 @@ footer nav ul {
 }
 .separation {
   border-top: 2px solid #e3e3e3;
-  width: 75%;
+  width: 85%;
 }
 
 .add-img {
-  width: 250px;
+  width: 50%;
 }
 
 /********************************************** Modal Part 2 **********************************************/
@@ -563,17 +584,55 @@ footer nav ul {
   background-color: #e8f1f6;
 }
 
-.custom-file-upload {
+.img-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
   display: flex;
+  justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.img-area img {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 100;
+}
+
+.img-area::before {
+	content: attr(data-img);
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	color: #fff;
+	font-weight: 500;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	pointer-events: none;
+	opacity: 0;
+	transition: all .3s ease;
+	z-index: 200;
+}
+
+.img-area.active:hover::before {
+	opacity: 1;
 }
 
 .fa-image {
   margin-top: 15px;
   font-size: 60px;
   color: #b9c5cc;
-  cursor: pointer;
 }
 
 .upload-img {
@@ -595,6 +654,7 @@ footer nav ul {
   margin-top: 5px;
   font-size: 11px;
 }
+
 
 /*----------- Formulaire -----------*/
 .title-and-catégorie {
