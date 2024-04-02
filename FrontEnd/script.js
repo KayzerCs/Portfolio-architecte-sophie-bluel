@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchAndDisplayProjects();
   setupModal();
   updateUIBasedOnLogin();
+  setupProjectSubmission();
 });
 
 //******* Fonction pour charger les projets et les catégories depuis l'API et les afficher
@@ -263,32 +264,39 @@ function setupModal() {
 
   // Lance une requête à l'API pour récupérer les catégories.
   fetch(baseURL + `categories`)
-    // Lorsque la requête est effectuée, `.then()` reçoit la réponse.
+    // Attend la réponse de la requête fetch précédente
     .then((response) => {
-      // Vérifie si le statut de la réponse n'indique pas un succès (par exemple, erreur 404 ou 500).
+      // Vérifie si le statut de la réponse n'est pas un succès (e.g., erreur 404, 500)
       if (!response.ok) {
-        // Lance une erreur si la réponse est erronée, ce qui stoppe l'exécution normale et passe au `.catch()`.
+        // Lance une erreur qui interrompt l'exécution du code suivant et passe directement au bloc catch
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      // Si la réponse est OK, convertit le corps de la réponse en JSON.
+      // Si la réponse est un succès, convertit la réponse en JSON
       return response.json();
     })
-    // Une fois la réponse convertie en JSON, cette partie du code est exécutée.
+    // Traite les données JSON une fois qu'elles sont reçues et converties
     .then((data) => {
-      // Sélectionne l'élément HTML 'select' par son ID 'categorie'.
+      // Sélectionne l'élément select HTML par son ID 'categorie'
       const select = document.querySelector("#categorie");
-      // Vide l'élément 'select' pour s'assurer qu'il n'y a pas d'options précédentes.
+      // Réinitialise le contenu de l'élément select pour s'assurer qu'il est vide
       select.innerHTML = "";
 
-      // Itère sur chaque catégorie reçue dans les données JSON.
+      // Crée une option par défaut qui sera affichée en premier dans le select
+      let defaultOption = document.createElement("option");
+      defaultOption.textContent = ""; // Définit le texte de l'option par défaut (ici vide)
+      defaultOption.value = ""; // Définit la valeur envoyée si cette option est sélectionnée (ici vide)
+      defaultOption.disabled = true; // Rend l'option non-sélectionnable
+      defaultOption.selected = true; // Définit cette option comme étant sélectionnée par défaut au chargement de la page
+      // Ajoute l'option par défaut au début du select
+      select.appendChild(defaultOption);
+
+      // Itère sur chaque catégorie reçue dans les données JSON
       data.forEach((categorie) => {
-        // Crée un nouvel élément 'option'.
+        // Crée un nouvel élément option pour chaque catégorie
         let option = document.createElement("option");
-        // Attribue l'ID de la catégorie comme valeur de l'option pour l'utiliser plus tard.
-        option.value = categorie.id;
-        // Met le nom de la catégorie comme texte visible dans l'option.
-        option.textContent = categorie.name;
-        // Ajoute l'option créée au 'select'.
+        option.value = categorie.id; // Définit l'ID de la catégorie comme valeur de l'option
+        option.textContent = categorie.name; // Utilise le nom de la catégorie comme texte visible dans l'option
+        // Ajoute l'option au select
         select.appendChild(option);
       });
     })
@@ -356,6 +364,58 @@ function setupModal() {
   });
 }
 
+function setupProjectSubmission() {
+  document.querySelector(".valide").addEventListener("click", function () {
+    const fileInput = document.querySelector('input[type="file"]');
+    const file = fileInput ? fileInput.files[0] : null;
+    const title = document.querySelector("#titre").value;
+    const categoryId = document.querySelector("#categorie").value;
+
+    // Vérifie la présence des informations nécessaires
+    if (!file || !title.trim() || !categoryId) {
+      alert("Tous les champs sont requis (image, titre, catégorie).");
+      return;
+    }
+
+    // Définit la taille maximale autorisée pour l'image à 4MB
+    const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB en octets
+    if (file.size > MAX_SIZE_ALLOWED) {
+      alert("La taille de l'image dépasse la limite autorisée de 4MB.");
+      return;
+    }
+
+    // Utilisation de FormData pour l'envoi des données
+    const formData = new FormData();
+    formData.append("image", file); // Ajoute le fichier image
+    formData.append("title", title); // Ajoute le titre
+    formData.append("categoryId", categoryId); // Ajoute l'ID de la catégorie
+
+    // Effectue la requête fetch avec FormData
+    fetch(baseURL + "works", {
+      method: "POST",
+      body: formData, // Pas besoin de spécifier 'Content-Type', FormData s'en charge
+      // Assure-toi que ton serveur/API est configuré pour accepter l'authentification comme ceci
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"), // Ajoute ton jeton d'authentification ici, si nécessaire
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Succès:", data);
+        alert("Projet ajouté avec succès!");
+        // Ici, tu peux ajouter du code pour rafraîchir la liste des projets ou fermer la modal
+      })
+      .catch((error) => {
+        console.error("Erreur:", error);
+        alert("Erreur lors de l'ajout du projet.");
+      });
+  });
+}
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
 function deleteProject(projectId) {
   // Récupère le token d'authentification stocké dans le localStorage du navigateur.
