@@ -364,58 +364,117 @@ function setupModal() {
   });
 }
 
+//*************************************************************************************************************************/
+// Configuration des écouteurs d'événements
 function setupProjectSubmission() {
-  document.querySelector(".valide").addEventListener("click", function () {
-    const fileInput = document.querySelector('input[type="file"]');
-    const file = fileInput ? fileInput.files[0] : null;
-    const title = document.querySelector("#titre").value;
-    const categoryId = document.querySelector("#categorie").value;
-
-    // Vérifie la présence des informations nécessaires
-    if (!file || !title.trim() || !categoryId) {
-      alert("Tous les champs sont requis (image, titre, catégorie).");
-      return;
-    }
-
-    // Définit la taille maximale autorisée pour l'image à 4MB
-    const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB en octets
-    if (file.size > MAX_SIZE_ALLOWED) {
-      alert("La taille de l'image dépasse la limite autorisée de 4MB.");
-      return;
-    }
-
-    // Utilisation de FormData pour l'envoi des données
-    const formData = new FormData();
-    formData.append("image", file); // Ajoute le fichier image
-    formData.append("title", title); // Ajoute le titre
-    formData.append("categoryId", categoryId); // Ajoute l'ID de la catégorie
-
-    // Effectue la requête fetch avec FormData
-    fetch(baseURL + "works", {
-      method: "POST",
-      body: formData, // Pas besoin de spécifier 'Content-Type', FormData s'en charge
-      // Assure-toi que ton serveur/API est configuré pour accepter l'authentification comme ceci
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"), // Ajoute ton jeton d'authentification ici, si nécessaire
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Succès:", data);
-        alert("Projet ajouté avec succès!");
-        // Ici, tu peux ajouter du code pour rafraîchir la liste des projets ou fermer la modal
-      })
-      .catch((error) => {
-        console.error("Erreur:", error);
-        alert("Erreur lors de l'ajout du projet.");
-      });
-  });
+  document
+    .querySelector(".valide")
+    .addEventListener("click", handleProjectSubmission);
 }
+
+// Gestion de la soumission du projet
+function handleProjectSubmission() {
+  const fileInput = document.querySelector('input[type="file"]');
+  const file = fileInput ? fileInput.files[0] : null;
+  const title = document.querySelector("#titre").value;
+  const categoryId = document.querySelector("#categorie").value;
+
+  // Log des données avant l'envoi de la requête
+  console.log("Données du projet :");
+  console.log("Image :", file);
+  console.log("Titre :", title);
+  console.log("Catégorie ID :", categoryId);
+
+  // Validation des données et envoi de la requête POST
+  if (!validateFormData(file, title, categoryId)) {
+    return;
+  }
+
+  const formData = buildFormData(file, title, categoryId);
+  submitFormData(formData);
+}
+
+// Fonction pour envoyer la requête POST avec FormData
+function submitFormData(formData) {
+  fetch(baseURL + "works", {
+    method: "POST",
+    body: formData,
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Succès:", data);
+      alert("Projet ajouté avec succès!");
+
+      // Ajout du projet aux galeries
+      addToGalleries(data);
+    })
+    .catch((error) => {
+      console.error("Erreur:", error);
+      alert("Erreur lors de l'ajout du projet.");
+    });
+}
+
+// Fonction pour valider les données du formulaire
+function validateFormData(file, title, categoryId) {
+  if (!file || !title.trim() || !categoryId) {
+    alert("Tous les champs sont requis (image, titre, catégorie).");
+    return false;
+  }
+
+  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB en octets
+  if (file.size > MAX_SIZE_ALLOWED) {
+    alert("La taille de l'image dépasse la limite autorisée de 4MB.");
+    return false;
+  }
+
+  return true;
+}
+
+// Fonction pour construire l'objet FormData
+function buildFormData(file, title, categoryId) {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("title", title);
+  formData.append("categoryId", categoryId);
+  return formData;
+}
+
+// Fonction pour ajouter le projet aux galeries
+function addToGalleries(project) {
+  // Sélection des conteneurs des galeries dans le DOM par leurs identifiants
+  const galleryContainerOriginal = document.getElementById(
+    "GalleryContainerOriginal"
+  );
+  const galleryContainerModal = document.getElementById(
+    "GalleryContainerModal"
+  );
+
+  // Création d'un élément pour la galerie originale et ajout au conteneur correspondant
+  const figureElementOriginal = createGalleryItem(
+    project,
+    "gallery-item-original",
+    false
+  );
+  galleryContainerOriginal.appendChild(figureElementOriginal);
+
+  // Création d'un élément pour la galerie modale et ajout au conteneur correspondant
+  const figureElementModal = createGalleryItem(
+    project,
+    "gallery-item-modal",
+    true
+  );
+  galleryContainerModal.appendChild(figureElementModal);
+}
+//*************************************************************************************************************************/
+
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
 function deleteProject(projectId) {
   // Récupère le token d'authentification stocké dans le localStorage du navigateur.
