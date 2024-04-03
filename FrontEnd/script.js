@@ -411,15 +411,9 @@ function submitFormData(formData) {
       return response.json();
     })
     .then((data) => {
-      console.log("Succès:", data);
-      alert("Projet ajouté avec succès!");
-
+      console.log("Projet ajouté avec succès!:", data);
       // Ajout du projet aux galeries
       addToGalleries(data);
-    })
-    .catch((error) => {
-      console.error("Erreur:", error);
-      alert("Erreur lors de l'ajout du projet.");
     });
 }
 
