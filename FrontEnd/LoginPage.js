@@ -3,7 +3,7 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const formContainer = loginForm.parentNode;
 const errorMessageDiv = document.createElement("div");
-import { baseURL } from "./script.js";
+const baseURL = "http://localhost:5678/api/";
 
 document.addEventListener("DOMContentLoaded", function () {
   errorMessageDiv.classList.add("error-message");

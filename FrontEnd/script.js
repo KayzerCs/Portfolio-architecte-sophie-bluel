@@ -1,4 +1,4 @@
-export const baseURL = "http://localhost:5678/api/";
+const baseURL = "http://localhost:5678/api/";
 const filterContainer = document.getElementById("FiltersContainer");
 const loginButton = document.getElementById("loginButton");
 const editionContainer = document.getElementById("editionContainer");
@@ -312,7 +312,6 @@ function setupModal() {
   });
 
   // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
-  // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
   function handleFileChange() {
     // Récupère le premier fichier sélectionné par l'utilisateur
     const image = inputFile.files[0];
@@ -377,20 +376,22 @@ function handleProjectSubmission() {
   const fileInput = document.querySelector('input[type="file"]');
   const file = fileInput ? fileInput.files[0] : null;
   const title = document.querySelector("#titre").value;
-  const categoryId = document.querySelector("#categorie").value;
+  const category = document.querySelector("#categorie").value;
+
+  console.log(category);
 
   // Log des données avant l'envoi de la requête
   console.log("Données du projet :");
   console.log("Image :", file);
   console.log("Titre :", title);
-  console.log("Catégorie ID :", categoryId);
+  console.log("Catégorie ID :", category);
 
   // Validation des données et envoi de la requête POST
-  if (!validateFormData(file, title, categoryId)) {
+  if (!validateFormData(file, title, category)) {
     return;
   }
 
-  const formData = buildFormData(file, title, categoryId);
+  const formData = buildFormData(file, title, category);
   submitFormData(formData);
 }
 
@@ -439,11 +440,11 @@ function validateFormData(file, title, categoryId) {
 }
 
 // Fonction pour construire l'objet FormData
-function buildFormData(file, title, categoryId) {
+function buildFormData(file, title, category) {
   const formData = new FormData();
   formData.append("image", file);
   formData.append("title", title);
-  formData.append("categoryId", categoryId);
+  formData.append("category", category);
   return formData;
 }
 
@@ -497,7 +498,8 @@ function deleteProject(projectId) {
       }
       // Si la réponse est OK, parse le corps de la réponse comme JSON.
       // Cela est souvent une formalité avec des APIs REST, même si le contenu n'est pas toujours utile après une suppression.
-      return response.json();
+
+      return response;
     })
     .then(() => {
       // Deuxième fonction de rappel .then : exécutée après la résolution de response.json().
@@ -516,6 +518,7 @@ function deleteProject(projectId) {
 //******* Fonction pour supprimer un projet du DOM en utilisant son ID de projet.
 function removeProjectFromDOM(projectId) {
   // Sélectionne tous les éléments dans le DOM qui ont une classe `.project` et un attribut `data-id` correspondant à l'ID du projet passé en argument.
+  console.log(document.querySelectorAll(`.project[data-id="${projectId}"]`));
   document
     .querySelectorAll(`.project[data-id="${projectId}"]`)
     .forEach((project) => {
