@@ -133,7 +133,7 @@ function displayProjects(data) {
 function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
-  figureElement.className = className; // Classe CSS pour styliser l'élément
+  figureElement.className = `${className} project`; // Classe CSS pour styliser l'élément
   figureElement.dataset.category = project.category.name.toLowerCase(); // Catégorie du projet pour éventuels filtres
   figureElement.id = project.id; // Identifiant unique du projet
 
@@ -156,8 +156,8 @@ function createGalleryItem(project, className, isModal) {
     const deleteIcon = document.createElement("i");
     deleteIcon.className = "fa-solid fa-trash-can"; // Classe FontAwesome pour l'icône
     deleteIcon.onclick = function () {
-      // Fonction appelée lors du clic sur l'icône, pour la suppression du projet
-      console.log(`Supprimer le projet: ${project.id}`);
+      // console.log(`Supprimer le projet: ${project.id}`);
+      deleteProject(project.id);
     };
 
     // Ajout de l'icône au bouton, puis du bouton à l'élément 'figure'
@@ -473,75 +473,88 @@ function buildFormData(file, title, category) {
 
 // Fonction pour ajouter le projet aux galeries
 function addToGalleries(project) {
-  // Sélection des conteneurs des galeries dans le DOM par leurs identifiants
-  const galleryContainerOriginal = document.getElementById(
-    "GalleryContainerOriginal"
-  );
-  const galleryContainerModal = document.getElementById(
-    "GalleryContainerModal"
-  );
-
-  // Création d'un élément pour la galerie originale et ajout au conteneur correspondant
+  // Appelle createGalleryItem pour le nouveau projet avec le paramètre pour la galerie originale
   const figureElementOriginal = createGalleryItem(
     project,
     "gallery-item-original",
     false
   );
-  galleryContainerOriginal.appendChild(figureElementOriginal);
+  // Ajoute l'élément créé à la galerie originale
+  document
+    .getElementById("GalleryContainerOriginal")
+    .appendChild(figureElementOriginal);
 
-  // Création d'un élément pour la galerie modale et ajout au conteneur correspondant
+  // Appelle createGalleryItem pour le nouveau projet avec le paramètre pour la galerie modale
   const figureElementModal = createGalleryItem(
     project,
     "gallery-item-modal",
     true
   );
-  galleryContainerModal.appendChild(figureElementModal);
+  // Ajoute l'élément créé à la galerie modale
+  document
+    .getElementById("GalleryContainerModal")
+    .appendChild(figureElementModal);
+
+  // Optionnel: Fermer la modale d'ajout et/ou réinitialiser le formulaire
+  closeModalAndResetForm();
+}
+
+// Fonction pour fermer la modale et réinitialiser le formulaire
+function closeModalAndResetForm() {
+  // Ferme la modale, si vous avez un identifiant spécifique pour la modale d'ajout, utilisez-le ici
+  const modal = document.getElementById("myModal"); // Assurez-vous que c'est le bon ID
+  modal.style.display = "none";
+
+  // Réinitialiser le formulaire d'ajout de projet, suppose que vous avez un formulaire avec un identifiant spécifique
+  const form = document.querySelector("form"); // Utilisez le bon sélecteur pour votre formulaire
+  form.reset();
+
+  // Réinitialise également l'aperçu de l'image si vous avez une section d'aperçu d'image
+  const imgPreview = document.querySelector(".img-area img"); // Assurez-vous que c'est le bon sélecteur
+  if (imgPreview) {
+    imgPreview.src = ""; // Ou définissez-le sur une image par défaut
+  }
+
+  // Si vous gérez l'état de chargement (comme un spinner), assurez-vous de le désactiver ici
 }
 //*************************************************************************************************************************/
 
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
 function deleteProject(projectId) {
-  // Récupère le token d'authentification stocké dans le localStorage du navigateur.
   const token = localStorage.getItem("token");
 
-  // Effectue une requête HTTP DELETE vers l'API pour supprimer le projet spécifié par projectId.
   fetch(`http://localhost:5678/api/works/${projectId}`, {
-    method: "DELETE", // Spécifie la méthode HTTP DELETE pour la requête.
+    method: "DELETE",
     headers: {
-      // Inclut le token d'authentification dans les en-têtes de la requête,
-      // formaté comme un Bearer token.
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((response) => {
-      // Première fonction de rappel .then : vérifie la réponse de l'API.
-      if (!response.ok) {
-        // Si la réponse n'est pas OK (par exemple, status 200), lance une exception.
-        throw new Error("La suppression du projet a échoué.");
-      }
-      // Si la réponse est OK, parse le corps de la réponse comme JSON.
-      // Cela est souvent une formalité avec des APIs REST, même si le contenu n'est pas toujours utile après une suppression.
-
-      return response;
-    })
-    .then(() => {
-      // Deuxième fonction de rappel .then : exécutée après la résolution de response.json().
-      console.log("Projet supprimé avec succès de l'API");
-      // Appelle la fonction removeProjectFromDOM avec l'ID du projet,
-      // pour le supprimer également de l'interface utilisateur.
-      removeProjectFromDOM(projectId);
-    })
-    .catch((error) => {
-      // Fonction de rappel .catch pour attraper les erreurs survenues dans la chaîne de promesses.
-      // Ceci inclut les erreurs lancées manuellement dans le premier .then ainsi que les erreurs de réseau.
-      console.error("Erreur lors de la suppression du projet:", error);
-    });
+  .then(response => {
+    if (!response.ok) {
+      // Affichage plus détaillé basé sur le statut de la réponse
+      response.json().then(errorDetails => {
+        console.error("Détails de l'erreur :", errorDetails);
+        // Ici, vous pourriez ajuster votre traitement d'erreur en fonction de `errorDetails`
+      });
+      throw new Error(`La suppression du projet a échoué avec le statut : ${response.status}`);
+    }
+    // Optionnel: si vous vous attendez à un corps de réponse même en cas de succès
+    return response.json();
+  })
+  .then(data => {
+    // Traitement en cas de succès, si nécessaire
+    console.log("Projet supprimé avec succès", data);
+    removeProjectFromDOM(projectId);
+  })
+  .catch(error => {
+    console.error("Erreur lors de la suppression du projet:", error);
+  });
 }
+
 
 //******* Fonction pour supprimer un projet du DOM en utilisant son ID de projet.
 function removeProjectFromDOM(projectId) {
   // Sélectionne tous les éléments dans le DOM qui ont une classe `.project` et un attribut `data-id` correspondant à l'ID du projet passé en argument.
-  console.log(document.querySelectorAll(`.project[data-id="${projectId}"]`));
   document
     .querySelectorAll(`.project[data-id="${projectId}"]`)
     .forEach((project) => {
