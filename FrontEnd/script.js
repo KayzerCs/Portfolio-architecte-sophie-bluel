@@ -119,7 +119,8 @@ function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
   figureElement.className = className; // Classe CSS pour styliser l'élément
-  figureElement.dataset.category = project.category.name.toLowerCase(); // Catégorie du projet pour éventuels filtres
+  figureElement.dataset.category =
+    project.category?.name.toLowerCase() ?? "non-classifié"; // Catégorie du projet pour éventuels filtres
   figureElement.id = project.id; // Identifiant unique du projet
 
   // Création et configuration de l'élément 'img' pour l'image du projet
