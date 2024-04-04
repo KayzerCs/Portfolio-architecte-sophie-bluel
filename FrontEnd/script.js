@@ -135,7 +135,7 @@ function createGalleryItem(project, className, isModal) {
   const figureElement = document.createElement("figure");
   figureElement.className = `${className} project`; // Classe CSS pour styliser l'élément
   figureElement.dataset.category = project.category.name.toLowerCase(); // Catégorie du projet pour éventuels filtres
-  figureElement.id = project.id; // Identifiant unique du projet
+  figureElement.setAttribute("data-id", project.id); // Identifiant unique du projet
 
   // Création et configuration de l'élément 'img' pour l'image du projet
   const imageElement = document.createElement("img");
@@ -529,28 +529,36 @@ function deleteProject(projectId) {
       Authorization: `Bearer ${token}`,
     },
   })
-  .then(response => {
-    if (!response.ok) {
-      // Affichage plus détaillé basé sur le statut de la réponse
-      response.json().then(errorDetails => {
-        console.error("Détails de l'erreur :", errorDetails);
-        // Ici, vous pourriez ajuster votre traitement d'erreur en fonction de `errorDetails`
-      });
-      throw new Error(`La suppression du projet a échoué avec le statut : ${response.status}`);
-    }
-    // Optionnel: si vous vous attendez à un corps de réponse même en cas de succès
-    return response.json();
-  })
-  .then(data => {
-    // Traitement en cas de succès, si nécessaire
-    console.log("Projet supprimé avec succès", data);
-    removeProjectFromDOM(projectId);
-  })
-  .catch(error => {
-    console.error("Erreur lors de la suppression du projet:", error);
-  });
+    .then((response) => {
+      if (!response.ok) {
+        // Si la réponse n'est pas OK, tentez de lire le corps de la réponse comme JSON pour obtenir plus de détails sur l'erreur
+        // Cela est uniquement nécessaire si vous êtes sûr que votre API envoie des détails d'erreur en JSON même pour les réponses d'erreur.
+        response
+          .json()
+          .then((errorDetails) => {
+            console.error("Détails de l'erreur :", errorDetails);
+            // Traitez ici les détails de l'erreur
+          })
+          .catch((jsonError) => {
+            // Si l'erreur se produit ici, cela signifie que le corps n'était pas du JSON valide,
+            // ce qui peut arriver si l'API ne renvoie rien ou renvoie quelque chose qui n'est pas du JSON.
+            console.error(
+              "Erreur lors de la lecture des détails de l'erreur:",
+              jsonError
+            );
+          });
+        throw new Error(
+          `La suppression du projet a échoué avec le statut : ${response.status}`
+        );
+      }
+      // Si la réponse est OK et qu'on ne s'attend pas à un corps de réponse, on peut ignorer l'étape de lecture du JSON.
+      console.log("Projet supprimé avec succès");
+      removeProjectFromDOM(projectId);
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la suppression du projet:", error);
+    });
 }
-
 
 //******* Fonction pour supprimer un projet du DOM en utilisant son ID de projet.
 function removeProjectFromDOM(projectId) {
@@ -571,23 +579,20 @@ document
   .querySelectorAll("#GalleryContainerModal, #GalleryContainerOriginal")
   .forEach((container) => {
     container.addEventListener("click", function (event) {
-      // Utilise event.target pour trouver le bouton de suppression le plus proche du clic.
-      // Si un tel bouton est trouvé, cela signifie que l'utilisateur a cliqué sur un bouton de suppression.
       const deleteBtn = event.target.closest(".delete-btn");
       if (deleteBtn) {
-        // Vérifie si le clic était sur un bouton de suppression.
-        // Trouve l'élément du projet le plus proche à partir du bouton de suppression.
-        // Cela permet de s'assurer que l'action de suppression est liée à l'élément correct.
-        const projectElement = deleteBtn.closest(".gallery-item-modal");
-        if (projectElement && projectElement.id) {
-          // Vérifie si l'élément du projet et son ID existent.
-          // Appelle la fonction deleteProject avec l'ID de l'élément du projet pour effectuer la suppression.
-          deleteProject(projectElement.id);
-        } else {
-          // Affiche un message d'erreur si l'élément du projet ciblé n'a pas d'ID valide.
-          console.error(
-            "Impossible de trouver l'élément projet avec un ID valide."
-          );
+        // Ici, utilisez `closest` pour trouver l'élément avec la classe `.project`
+        const projectElement = deleteBtn.closest(".project");
+        if (projectElement) {
+          // Utilisez `getAttribute` pour récupérer la valeur de `data-id`
+          const projectId = projectElement.getAttribute("data-id");
+          if (projectId) {
+            deleteProject(projectId);
+          } else {
+            console.error(
+              "Impossible de trouver l'élément projet avec un ID valide."
+            );
+          }
         }
       }
     });
