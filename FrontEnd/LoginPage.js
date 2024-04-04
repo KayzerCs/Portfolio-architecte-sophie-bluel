@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         formContainer.insertBefore(errorMessageDiv, loginForm);
         emailInput.value = "";
         passwordInput.value = "";
-        setTimeout(() => errorMessageDiv.remove(), 20000);
+        setTimeout(() => errorMessageDiv.remove(), 2000);
       });
   });
 });
