@@ -7,6 +7,8 @@ const selectImage = document.querySelector(".upload-img");
 const inputFile = document.querySelector("#file");
 const imgArea = document.querySelector(".img-area");
 
+let availableCategories = [];
+
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
   // // Récupère l'état de connexion depuis LocalStorage
@@ -61,23 +63,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //******* Fonction pour charger les projets et les catégories depuis l'API et les afficher
 function fetchAndDisplayProjects() {
-  fetch(baseURL + "works")
-    .then((response) => response.json()) // Convertit la réponse en JSON
-    .then((data) => {
-      displayProjects(data); // Affiche les projets avec les données récupérées
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la récupération des données:", error);
+  // Assurez-vous que les catégories sont chargées avant de traiter les projets
+  fetch(baseURL + "categories")
+    .then((response) => response.json())
+    .then((categoriesData) => {
+      availableCategories = categoriesData;
+      displayFilterButtons(categoriesData);
     });
 
-  fetch(baseURL + "categories")
-    .then((response) => response.json()) // Convertit la réponse en JSON
-    .then((categories) => {
-      displayFilterButtons(categories); // Affiche les projets avec les données récupérées
+  fetch(baseURL + "works")
+    .then((response) => response.json())
+    .then((data) => {
+      const projectsWithCompleteCategories = data.map(completeProjectCategory);
+      displayProjects(projectsWithCompleteCategories);
     })
     .catch((error) =>
-      console.error("Erreur lors de la récupération des catégories:", error)
+      console.error("Erreur lors de la récupération des données:", error)
     );
+}
+
+function completeProjectCategory(project) {
+  const category = availableCategories.find(
+    (c) => c.id === parseInt(project.categoryId)
+  );
+  if (category) {
+    project.category = { id: category.id, name: category.name };
+  } else {
+    // Attribuez une catégorie par défaut si nécessaire
+    project.category = { id: null, name: "Non classifié" };
+  }
+  return project;
 }
 
 //******* Fonction principale pour afficher les projets dans les galeries.
@@ -119,8 +134,7 @@ function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
   figureElement.className = className; // Classe CSS pour styliser l'élément
-  figureElement.dataset.category =
-    project.category?.name.toLowerCase() ?? "non-classifié"; // Catégorie du projet pour éventuels filtres
+  figureElement.dataset.category = project.category.name.toLowerCase(); // Catégorie du projet pour éventuels filtres
   figureElement.id = project.id; // Identifiant unique du projet
 
   // Création et configuration de l'élément 'img' pour l'image du projet
@@ -412,9 +426,23 @@ function submitFormData(formData) {
       return response.json();
     })
     .then((data) => {
-      console.log("Projet ajouté avec succès!:", data);
-      // Ajout du projet aux galeries
-      addToGalleries(data);
+      console.log("Projet ajouté avec succès:", data);
+      if (
+        data &&
+        data.id &&
+        data.imageUrl &&
+        data.title &&
+        data.categoryId // Vérifiez l'existence de categoryId au lieu de category.name
+      ) {
+        // Puisque l'objet category n'est pas inclus, complétez-le si nécessaire
+        const completedProject = completeProjectCategory(data); // Assurez-vous que cette fonction est définie et disponible
+        addToGalleries(completedProject); // Ajoutez le projet complété aux galeries
+      } else {
+        console.error("Données du projet incomplètes", data);
+      }
+    })
+    .catch((error) => {
+      console.error("Erreur lors de l'ajout du projet:", error);
     });
 }
 
