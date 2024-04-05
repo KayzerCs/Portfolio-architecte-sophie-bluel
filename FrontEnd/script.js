@@ -6,12 +6,11 @@ const IconPortfolio = document.querySelector(".icon-portfolio");
 const selectImage = document.querySelector(".upload-img");
 const inputFile = document.querySelector("#file");
 const imgArea = document.querySelector(".img-area");
-
 let availableCategories = [];
 
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
-  // // Récupère l'état de connexion depuis LocalStorage
+  // Récupère l'état de connexion depuis LocalStorage
   let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   // Met à jour l'affichage Connexion/Déconnexion
@@ -30,23 +29,17 @@ function updateUIBasedOnLogin() {
     IconPortfolio.style.display = "none";
   }
 
-  // Ajoute un écouteur d'événement de clic sur le bouton de connexion (loginButton).
+  // Événement au clic sur le bouton de connexion (loginButton).
   loginButton.addEventListener("click", () => {
     // Vérifie si l'utilisateur est actuellement connecté en examinant la variable isLoggedIn.
     if (isLoggedIn) {
-      // Si l'utilisateur est connecté (isLoggedIn est vrai), exécute les actions suivantes pour se déconnecter :
-
-      // Supprime l'indicateur de connexion du stockage local, ce qui efface l'état de connexion persistant.
       localStorage.removeItem("isLoggedIn");
-      // Supprime également le token d'authentification du stockage local.
       localStorage.removeItem("token");
-
-      // Met à jour la variable d'état de connexion pour refléter que l'utilisateur n'est plus connecté.
       isLoggedIn = false;
-      // Rafraîchit la page pour réinitialiser l'état de l'interface utilisateur en fonction du nouvel état de connexion.
       window.location.reload();
-    } else {
-      // Si l'utilisateur n'est pas connecté (isLoggedIn est faux), redirige vers la page de connexion.
+    }
+    // Si l'utilisateur n'est pas connecté (isLoggedIn est faux), redirige vers la page de connexion.
+    else {
       window.location.href = "login.html";
     }
   });
@@ -54,7 +47,6 @@ function updateUIBasedOnLogin() {
 
 //******* Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
 document.addEventListener("DOMContentLoaded", function () {
-  // Appelle la fonction pour charger les projets depuis l'API
   fetchAndDisplayProjects();
   setupModal();
   updateUIBasedOnLogin();
@@ -63,7 +55,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //******* Fonction pour charger les projets et les catégories depuis l'API et les afficher
 function fetchAndDisplayProjects() {
-  // Assurez-vous que les catégories sont chargées avant de traiter les projets
   fetch(baseURL + "categories")
     .then((response) => response.json())
     .then((categoriesData) => {
@@ -82,14 +73,18 @@ function fetchAndDisplayProjects() {
     );
 }
 
+// Enrichit un projet avec des détails de catégorie basés sur son categoryId, assignant une catégorie par défaut si non trouvée.
 function completeProjectCategory(project) {
+  // Recherche dans le tableau `availableCategories` une catégorie dont l'ID correspond à `project.categoryId`.
   const category = availableCategories.find(
     (c) => c.id === parseInt(project.categoryId)
   );
+  // Si une catégorie correspondante est trouvée, met à jour `project` pour inclure les détails complets de cette catégorie.
   if (category) {
     project.category = { id: category.id, name: category.name };
-  } else {
-    // Attribuez une catégorie par défaut si nécessaire
+  }
+  // Si aucune catégorie correspondante n'est trouvée, attribue une catégorie par défaut à `project`.
+  else {
     project.category = { id: null, name: "Non classifié" };
   }
   return project;
@@ -97,7 +92,6 @@ function completeProjectCategory(project) {
 
 //******* Fonction principale pour afficher les projets dans les galeries.
 function displayProjects(data) {
-  // Sélection des conteneurs des galeries dans le DOM par leurs identifiants
   const galleryContainerOriginal = document.getElementById(
     "GalleryContainerOriginal"
   );
@@ -105,7 +99,6 @@ function displayProjects(data) {
     "GalleryContainerModal"
   );
 
-  // Nettoyage des conteneurs pour s'assurer qu'ils sont vides avant d'ajouter les nouveaux éléments
   galleryContainerOriginal.innerHTML = "";
   galleryContainerModal.innerHTML = "";
 
@@ -129,19 +122,19 @@ function displayProjects(data) {
   });
 }
 
-//******* Fonction pour créer un élément de galerie (figure) basé sur un projet.
+//******* Fonction pour créer un élément de galerie (figure).
 function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
-  figureElement.className = `${className} project`; // Classe CSS pour styliser l'élément
-  figureElement.dataset.category = project.category.name.toLowerCase(); // Catégorie du projet pour éventuels filtres
-  figureElement.setAttribute("data-id", project.id); // Identifiant unique du projet
+  figureElement.className = `${className} project`;
+  figureElement.dataset.category = project.category.name.toLowerCase();
+  figureElement.setAttribute("data-id", project.id);
 
   // Création et configuration de l'élément 'img' pour l'image du projet
   const imageElement = document.createElement("img");
-  imageElement.src = project.imageUrl; // Source de l'image
-  imageElement.alt = project.title; // Texte alternatif pour l'accessibilité
-  imageElement.title = project.title; // Titre affiché au survol pour l'info-bulle
+  imageElement.src = project.imageUrl;
+  imageElement.alt = project.title;
+  imageElement.title = project.title;
 
   // Ajout de l'image au 'figure'
   figureElement.appendChild(imageElement);
@@ -150,13 +143,12 @@ function createGalleryItem(project, className, isModal) {
     // Pour la galerie modale, ajout d'un bouton qui contiendra l'icône de corbeille pour la suppression
     const button = document.createElement("button");
     button.className = "delete-btn";
-    button.setAttribute("type", "button"); // Bonne pratique pour les boutons dans les formulaires
+    button.setAttribute("type", "button");
 
     // Création de l'icône de corbeille et ajout au bouton
     const deleteIcon = document.createElement("i");
-    deleteIcon.className = "fa-solid fa-trash-can"; // Classe FontAwesome pour l'icône
+    deleteIcon.className = "fa-solid fa-trash-can";
     deleteIcon.onclick = function () {
-      // console.log(`Supprimer le projet: ${project.id}`);
       deleteProject(project.id);
     };
 
@@ -178,10 +170,8 @@ function createGalleryItem(project, className, isModal) {
 function displayFilterButtons(categories) {
   filterContainer.innerHTML = "";
 
-  // Crée et ajoute un bouton pour réinitialiser le filtre et afficher tous les projets.
   filterContainer.appendChild(createFilterButton("all", "Tous"));
 
-  // Pour chaque catégorie, crée un bouton de filtre et l'ajoute au conteneur de filtres.
   categories.forEach((category) => {
     filterContainer.appendChild(
       createFilterButton(category.name.toLowerCase(), category.name)
@@ -191,39 +181,32 @@ function displayFilterButtons(categories) {
 
 //******* Crée un bouton de filtre.
 function createFilterButton(filterId, filterName) {
-  // Crée l'élément bouton et définit son texte et sa classe.
   const button = document.createElement("button");
   button.textContent = filterName;
   button.className = "filter-button";
-
-  // Stocke l'identifiant du filtre dans un attribut data- pour une utilisation ultérieure.
   button.dataset.filter = filterId;
 
-  // Ajoute un gestionnaire d'événement de clic qui filtrera les projets quand ce bouton est cliqué.
+  // Événement au clic qui filtrera les projets quand ce bouton est cliqué.
   button.addEventListener("click", () => filterProjects(filterId));
   return button;
 }
 
-//******* Filtre les projets affichés en fonction de l'identifiant de catégorie sélectionné.
+//******* Filtre les projets affichés en fonction de la catégorie sélectionné.
 function filterProjects(filterId) {
-  // Sélectionne tous les éléments figure dans le conteneur de la galerie.
   const allProjects = document.querySelectorAll(
     "#GalleryContainerOriginal figure"
   );
 
   // Itère sur chaque projet pour déterminer s'il doit être affiché ou masqué.
   allProjects.forEach((project) => {
-    // Affiche le projet si son identifiant de catégorie correspond au filtre sélectionné,
-    // ou si le filtre sélectionné est "all" pour tout afficher. Sinon, masque le projet.
     project.style.display =
       filterId === "all" || project.dataset.category === filterId ? "" : "none";
   });
 }
 
-//******* Configurer et gérer le comportement d'une fenêtre modale dans votre interface utilisateur
+//******* Configure et gère le comportement de la fenêtre modale dans votre interface utilisateur.
 function setupModal() {
-  // Sélectionne tous les éléments avec la classe .icon et attache un gestionnaire d'événements de clic
-  // pour ouvrir la modale identifiée par l'ID "myModal".
+  // Événements au clic  sur icons pour affichier la modal.
   const icons = document.querySelectorAll(".icon");
   icons.forEach((icon) => {
     icon.addEventListener("click", () => {
@@ -232,58 +215,47 @@ function setupModal() {
     });
   });
 
-  // Sélectionne le bouton de fermeture original dans la modale et attache un gestionnaire d'événements de clic
-  // pour fermer la modale en modifiant son style pour qu'elle ne soit pas affichée.
+  // Événements au clic  sur closeModalOriginal pour fermer la modal.
   const closeModalOriginal = document.querySelector(".modal .close-original");
   closeModalOriginal.addEventListener("click", () => {
     const modal = document.getElementById("myModal");
     modal.style.display = "none";
   });
 
-  // Sélectionne le bouton "Ajouter une photo" par son id et attache un gestionnaire d'événements de clic.
+  // Événements au clic sur addPhotoBtn pour afficher la (Modal Part 2).
   const addPhotoBtn = document.querySelector(".add-img");
   addPhotoBtn.addEventListener("click", () => {
-    // Sélectionne la première modal par son identifiant et la cache.
-    const firstModal = document.querySelector(".modal-original"); // Assurez-vous que c'est le bon ID
+    const firstModal = document.querySelector(".modal-original");
     firstModal.style.display = "none";
-
-    // Sélectionne la seconde modal par son identifiant et l'affiche.
-    const secondModal = document.querySelector(".modal-seconde"); // Assurez-vous que c'est le bon ID
+    const secondModal = document.querySelector(".modal-seconde");
     secondModal.style.display = "block";
   });
 
-  // Sélectionne un second bouton de fermeture dans la modale et réalise la même action que le premier
-  // bouton de fermeture pour cacher la modale lors du clic.
+  // Événements au clic  sur closeModalSeconde pour fermer la modal.
   const closeModalSeconde = document.querySelector(".modal .close-seconde");
   closeModalSeconde.addEventListener("click", () => {
     const modal = document.getElementById("myModal");
     modal.style.display = "none";
   });
 
-  // Sélectionne un bouton pour revenir au contenu original de la modale depuis un second contenu.
-  // Si ce bouton existe, attache un gestionnaire d'événements de clic pour changer l'affichage
-  // entre le contenu original et le second contenu de la modale.
+  // Événements au clic  sur backSecond pour back de (Modal Part 2) à (Modal Part 1)
   const backSecond = document.querySelector(".back-seconde");
   if (backSecond) {
     backSecond.addEventListener("click", () => {
       const originalContent = document.querySelector(".modal-original");
       const secondContent = document.querySelector(".modal-seconde");
 
-      // Assure que les deux contenus existent avant de tenter de modifier leur affichage.
       if (originalContent && secondContent) {
-        secondContent.style.display = "none"; // Cache le second contenu
-        originalContent.style.display = "block"; // Montre le contenu original
+        secondContent.style.display = "none";
+        originalContent.style.display = "block";
       }
     });
   }
 
   // Lance une requête à l'API pour récupérer les catégories.
   fetch(baseURL + `categories`)
-    // Attend la réponse de la requête fetch précédente
     .then((response) => {
-      // Vérifie si le statut de la réponse n'est pas un succès (e.g., erreur 404, 500)
       if (!response.ok) {
-        // Lance une erreur qui interrompt l'exécution du code suivant et passe directement au bloc catch
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       // Si la réponse est un succès, convertit la réponse en JSON
@@ -291,126 +263,93 @@ function setupModal() {
     })
     // Traite les données JSON une fois qu'elles sont reçues et converties
     .then((data) => {
-      // Sélectionne l'élément select HTML par son ID 'categorie'
       const select = document.querySelector("#categorie");
-      // Réinitialise le contenu de l'élément select pour s'assurer qu'il est vide
       select.innerHTML = "";
 
       // Crée une option par défaut qui sera affichée en premier dans le select
       let defaultOption = document.createElement("option");
-      defaultOption.textContent = ""; // Définit le texte de l'option par défaut (ici vide)
-      defaultOption.value = ""; // Définit la valeur envoyée si cette option est sélectionnée (ici vide)
-      defaultOption.disabled = true; // Rend l'option non-sélectionnable
-      defaultOption.selected = true; // Définit cette option comme étant sélectionnée par défaut au chargement de la page
-      // Ajoute l'option par défaut au début du select
+      defaultOption.textContent = "";
+      defaultOption.value = "";
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
       select.appendChild(defaultOption);
 
       // Itère sur chaque catégorie reçue dans les données JSON
       data.forEach((categorie) => {
-        // Crée un nouvel élément option pour chaque catégorie
         let option = document.createElement("option");
-        option.value = categorie.id; // Définit l'ID de la catégorie comme valeur de l'option
-        option.textContent = categorie.name; // Utilise le nom de la catégorie comme texte visible dans l'option
-        // Ajoute l'option au select
+        option.value = categorie.id;
+        option.textContent = categorie.name;
         select.appendChild(option);
       });
     })
-    // En cas d'erreur à n'importe quelle étape ci-dessus, le code dans `.catch()` est exécuté.
     .catch((error) => {
-      // Affiche l'erreur dans la console du navigateur.
-      console.error("Could not load categories:", error);
+      console.error("Impossible de charger les catégories :", error);
     });
 
-  // Écouteur d'événement sur selectImage pour déclencher la sélection de fichier
+  // Événement au clic sur selectImage pour déclencher la sélection de fichier
   selectImage.addEventListener("click", function () {
     inputFile.click();
   });
 
   // Fonction pour gérer le chargement et l'affichage de l'image sélectionnée
   function handleFileChange() {
-    // Récupère le premier fichier sélectionné par l'utilisateur
     const image = inputFile.files[0];
-
-    // Vérifie si un fichier a été sélectionné
     if (image) {
-      // Crée un nouvel objet FileReader pour lire le contenu du fichier
       const reader = new FileReader();
 
       // Définit ce qui doit se passer une fois que le fichier est lu
       reader.onload = () => {
-        // Recherche une image existante dans imgArea et la supprime si elle existe
         // Cela assure que seulement une image est affichée à la fois
         const existingImg = imgArea.querySelector("img");
         if (existingImg) {
           imgArea.removeChild(existingImg);
         }
 
-        // Crée une nouvelle balise <img> et définit son URL source avec le résultat de FileReader
         const imgUrl = reader.result;
         const img = document.createElement("img");
         img.src = imgUrl;
-
-        // Ajoute une classe à l'image pour identification facile et application de styles CSS
         img.classList.add("changeable-image");
-
-        // Ajoute l'image nouvellement créée au conteneur imgArea pour l'afficher sur la page
         imgArea.appendChild(img);
       };
 
-      // Commence la lecture du fichier sélectionné et convertit le fichier en Data URL
-      // Une Data URL est une chaîne de caractères qui représente le fichier, permettant son affichage comme source d'image
+      // Lit le fichier et déclenche l'événement `onload` une fois la lecture terminée.
       reader.readAsDataURL(image);
     }
   }
 
-  // Ajoute un écouteur d'événement sur inputFile pour détecter quand un utilisateur sélectionne un fichier
+  // Écouteur d'événement sur inputFile pour détecter quand un utilisateur sélectionne un fichier.
   inputFile.addEventListener("change", handleFileChange);
 
-  // Ajoute un écouteur d'événements sur imgArea pour gérer les clics sur les images à l'intérieur
-  // Cela permet de redéclencher la sélection de fichier quand l'utilisateur clique sur l'image affichée
+  // Événement au clic sur imgArea pour re sélectionner un fichier.
   imgArea.addEventListener("click", function (event) {
-    // Vérifie si l'élément cliqué a la classe "changeable-image"
     if (event.target.classList.contains("changeable-image")) {
-      // Si oui, cela signifie que l'utilisateur a cliqué sur l'image
-      // Déclenche alors un clic sur inputFile pour ouvrir la boîte de dialogue de sélection de fichier
       inputFile.click();
     }
   });
 }
 
-//*************************************************************************************************************************/
-// Configuration des écouteurs d'événements
+//******* Initialise l'écouteur d'événements sur le bouton de soumission pour gérer la soumission de projets.
 function setupProjectSubmission() {
   document
     .querySelector(".valide")
     .addEventListener("click", handleProjectSubmission);
 }
 
-// Gestion de la soumission du projet
+//******* Gère la soumission d'un nouveau projet en validant et préparant les données du formulaire.
 function handleProjectSubmission() {
   const fileInput = document.querySelector('input[type="file"]');
   const file = fileInput ? fileInput.files[0] : null;
   const title = document.querySelector("#titre").value;
   const category = document.querySelector("#categorie").value;
 
-  console.log(category);
-
-  // Log des données avant l'envoi de la requête
-  console.log("Données du projet :");
-  console.log("Image :", file);
-  console.log("Titre :", title);
-  console.log("Catégorie ID :", category);
-
-  // Validation des données et envoi de la requête POST
   if (!validateFormData(file, title, category)) {
     return;
   }
-
   const formData = buildFormData(file, title, category);
   submitFormData(formData);
 }
 
-// Fonction pour envoyer la requête POST avec FormData
+//******* Soumet les données de projet à l'API via POST, traite la réponse pour mise à jour de l'UI, et gère les erreurs potentielles.
 function submitFormData(formData) {
   fetch(baseURL + "works", {
     method: "POST",
@@ -426,17 +365,9 @@ function submitFormData(formData) {
       return response.json();
     })
     .then((data) => {
-      console.log("Projet ajouté avec succès:", data);
-      if (
-        data &&
-        data.id &&
-        data.imageUrl &&
-        data.title &&
-        data.categoryId // Vérifiez l'existence de categoryId au lieu de category.name
-      ) {
-        // Puisque l'objet category n'est pas inclus, complétez-le si nécessaire
-        const completedProject = completeProjectCategory(data); // Assurez-vous que cette fonction est définie et disponible
-        addToGalleries(completedProject); // Ajoutez le projet complété aux galeries
+      if (data && data.id && data.imageUrl && data.title && data.categoryId) {
+        const completedProject = completeProjectCategory(data);
+        addToGalleries(completedProject);
       } else {
         console.error("Données du projet incomplètes", data);
       }
@@ -446,23 +377,23 @@ function submitFormData(formData) {
     });
 }
 
-// Fonction pour valider les données du formulaire
+//******* Valide le fichier, le titre, et la catégorie du formulaire avant envoi : vérifie la présence et la taille adéquate de l'image.
 function validateFormData(file, title, categoryId) {
   if (!file || !title.trim() || !categoryId) {
-    alert("Tous les champs sont requis (image, titre, catégorie).");
+    alert("Tous les champs sont requis (image, titre, catégorie)."); //******** Modifier l'alerte par un message HTML & CSS comme LoginPage ********//
     return false;
   }
 
-  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB en octets
+  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024;
   if (file.size > MAX_SIZE_ALLOWED) {
-    alert("La taille de l'image dépasse la limite autorisée de 4MB.");
+    alert("La taille de l'image dépasse la limite autorisée de 4MB."); //******** Modifier l'alerte par un message HTML & CSS comme LoginPage ********//
     return false;
   }
 
   return true;
 }
 
-// Fonction pour construire l'objet FormData
+//******* Construit un objet FormData pour l'envoi de fichiers et de données de projet via une requête HTTP.
 function buildFormData(file, title, category) {
   const formData = new FormData();
   formData.append("image", file);
@@ -471,52 +402,45 @@ function buildFormData(file, title, category) {
   return formData;
 }
 
-// Fonction pour ajouter le projet aux galeries
+//******* Ajoute un élément de projet aux galeries originale et modale, puis réinitialise la modale de soumission.
 function addToGalleries(project) {
-  // Appelle createGalleryItem pour le nouveau projet avec le paramètre pour la galerie originale
   const figureElementOriginal = createGalleryItem(
     project,
     "gallery-item-original",
     false
   );
-  // Ajoute l'élément créé à la galerie originale
   document
     .getElementById("GalleryContainerOriginal")
     .appendChild(figureElementOriginal);
 
-  // Appelle createGalleryItem pour le nouveau projet avec le paramètre pour la galerie modale
   const figureElementModal = createGalleryItem(
     project,
     "gallery-item-modal",
     true
   );
-  // Ajoute l'élément créé à la galerie modale
   document
     .getElementById("GalleryContainerModal")
     .appendChild(figureElementModal);
 
-  // Optionnel: Fermer la modale d'ajout et/ou réinitialiser le formulaire
   closeModalAndResetForm();
 }
 
-//******* Fonction pour fermer la modale et réinitialiser le formulaire
+//******* Fonction pour fermer la modale et réinitialiser le formulaire une fois l'action faite
 function closeModalAndResetForm() {
-
-  const modal = document.getElementById("myModal"); 
+  const modal = document.getElementById("myModal");
   modal.style.display = "none";
 
-  const form = document.getElementById("addProjectForm"); 
+  const form = document.getElementById("addProjectForm");
   form.reset();
 
   const categorySelect = document.getElementById("categorie");
   categorySelect.value = "";
 
-  const imgPreview = document.querySelector(".changeable-image"); 
-  imgPreview.remove(); 
-
+  const imgPreview = document.querySelector(".changeable-image");
+  imgPreview.remove();
 }
 
-//******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
+//******* Fonction pour supprimer un projet via l'API et mettre à jour l'interface utilisateur, avec gestion des erreurs et authentification.
 function deleteProject(projectId) {
   const token = localStorage.getItem("token");
 
@@ -528,17 +452,12 @@ function deleteProject(projectId) {
   })
     .then((response) => {
       if (!response.ok) {
-        // Si la réponse n'est pas OK, tentez de lire le corps de la réponse comme JSON pour obtenir plus de détails sur l'erreur
-        // Cela est uniquement nécessaire si vous êtes sûr que votre API envoie des détails d'erreur en JSON même pour les réponses d'erreur.
         response
           .json()
           .then((errorDetails) => {
             console.error("Détails de l'erreur :", errorDetails);
-            // Traitez ici les détails de l'erreur
           })
           .catch((jsonError) => {
-            // Si l'erreur se produit ici, cela signifie que le corps n'était pas du JSON valide,
-            // ce qui peut arriver si l'API ne renvoie rien ou renvoie quelque chose qui n'est pas du JSON.
             console.error(
               "Erreur lors de la lecture des détails de l'erreur:",
               jsonError
@@ -548,8 +467,6 @@ function deleteProject(projectId) {
           `La suppression du projet a échoué avec le statut : ${response.status}`
         );
       }
-      // Si la réponse est OK et qu'on ne s'attend pas à un corps de réponse, on peut ignorer l'étape de lecture du JSON.
-      console.log("Projet supprimé avec succès");
       removeProjectFromDOM(projectId);
     })
     .catch((error) => {
@@ -559,27 +476,22 @@ function deleteProject(projectId) {
 
 //******* Fonction pour supprimer un projet du DOM en utilisant son ID de projet.
 function removeProjectFromDOM(projectId) {
-  // Sélectionne tous les éléments dans le DOM qui ont une classe `.project` et un attribut `data-id` correspondant à l'ID du projet passé en argument.
   document
     .querySelectorAll(`.project[data-id="${projectId}"]`)
     .forEach((project) => {
-      // Pour chaque élément de projet trouvé, utilise la méthode `.remove()`
-      // pour le supprimer du DOM. Cela retire effectivement l'élément de la page,
-      // rendant la suppression du projet visuellement immédiate pour l'utilisateur.
       project.remove();
     });
 }
 
+//******* Écoute les clics sur deux conteneurs de galerie et, lorsqu'un bouton de suppression est cliqué, il déclenche la suppression du projet associé en utilisant l'ID stocké dans son attribut data-id
 document
   .querySelectorAll("#GalleryContainerModal, #GalleryContainerOriginal")
   .forEach((container) => {
     container.addEventListener("click", function (event) {
       const deleteBtn = event.target.closest(".delete-btn");
       if (deleteBtn) {
-        
         const projectElement = deleteBtn.closest(".project");
         if (projectElement) {
-          
           const projectId = projectElement.getAttribute("data-id");
           if (projectId) {
             deleteProject(projectId);
