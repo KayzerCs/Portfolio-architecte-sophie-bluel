@@ -499,25 +499,22 @@ function addToGalleries(project) {
   closeModalAndResetForm();
 }
 
-// Fonction pour fermer la modale et réinitialiser le formulaire
+//******* Fonction pour fermer la modale et réinitialiser le formulaire
 function closeModalAndResetForm() {
-  // Ferme la modale, si vous avez un identifiant spécifique pour la modale d'ajout, utilisez-le ici
-  const modal = document.getElementById("myModal"); // Assurez-vous que c'est le bon ID
+
+  const modal = document.getElementById("myModal"); 
   modal.style.display = "none";
 
-  // Réinitialiser le formulaire d'ajout de projet, suppose que vous avez un formulaire avec un identifiant spécifique
-  const form = document.querySelector("form"); // Utilisez le bon sélecteur pour votre formulaire
+  const form = document.getElementById("addProjectForm"); 
   form.reset();
 
-  // Réinitialise également l'aperçu de l'image si vous avez une section d'aperçu d'image
-  const imgPreview = document.querySelector(".img-area img"); // Assurez-vous que c'est le bon sélecteur
-  if (imgPreview) {
-    imgPreview.src = ""; // Ou définissez-le sur une image par défaut
-  }
+  const categorySelect = document.getElementById("categorie");
+  categorySelect.value = "";
 
-  // Si vous gérez l'état de chargement (comme un spinner), assurez-vous de le désactiver ici
+  const imgPreview = document.querySelector(".changeable-image"); 
+  imgPreview.remove(); 
+
 }
-//*************************************************************************************************************************/
 
 //******* Définition de la fonction deleteProject, qui prend en argument l'ID du projet à supprimer.
 function deleteProject(projectId) {
@@ -573,18 +570,16 @@ function removeProjectFromDOM(projectId) {
     });
 }
 
-//******* Attache un écouteur d'événements de clic aux conteneurs spécifiés. Cela permet de capturer
-//******* les clics sur les boutons de suppression sans avoir besoin d'attacher des écouteurs d'événements individuellement à chaque bouton.
 document
   .querySelectorAll("#GalleryContainerModal, #GalleryContainerOriginal")
   .forEach((container) => {
     container.addEventListener("click", function (event) {
       const deleteBtn = event.target.closest(".delete-btn");
       if (deleteBtn) {
-        // Ici, utilisez `closest` pour trouver l'élément avec la classe `.project`
+        
         const projectElement = deleteBtn.closest(".project");
         if (projectElement) {
-          // Utilisez `getAttribute` pour récupérer la valeur de `data-id`
+          
           const projectId = projectElement.getAttribute("data-id");
           if (projectId) {
             deleteProject(projectId);
