@@ -379,17 +379,29 @@ function submitFormData(formData) {
 
 //******* Valide le fichier, le titre, et la catégorie du formulaire avant envoi : vérifie la présence et la taille adéquate de l'image.
 function validateFormData(file, title, categoryId) {
+  // Sélectionnez l'élément qui affichera le message d'erreur
+  const errorMessageElement = document.getElementById("error-message-modal");
+
   if (!file || !title.trim() || !categoryId) {
-    alert("Tous les champs sont requis (image, titre, catégorie)."); //******** Modifier l'alerte par un message HTML & CSS comme LoginPage ********//
+    errorMessageElement.textContent =
+      "Tous les champs sont requis (image, titre, catégorie).";
+    errorMessageElement.style.display = "block"; //
+    setTimeout(() => {
+      errorMessageElement.style.display = "none";
+    }, 3500);
     return false;
   }
 
-  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024;
+  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB
   if (file.size > MAX_SIZE_ALLOWED) {
-    alert("La taille de l'image dépasse la limite autorisée de 4MB."); //******** Modifier l'alerte par un message HTML & CSS comme LoginPage ********//
+    errorMessageElement.textContent =
+      "La taille de l'image dépasse la limite autorisée de 4MB.";
+    errorMessageElement.style.display = "block";
+    setTimeout(() => {
+      errorMessageElement.style.display = "none";
+    }, 3500);
     return false;
   }
-
   return true;
 }
 

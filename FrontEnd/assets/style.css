@@ -397,6 +397,7 @@ footer nav ul {
 
 /********************************************** Message erreur **********************************************/
 
+/* Msg erreur LoginPage */
 .error-message {
   padding: 10px;
   margin-top: 10px;
@@ -414,6 +415,21 @@ footer nav ul {
 .error-message::before {
   padding-right: 5px;
   font-weight: bold;
+}
+
+/* Msg erreur Ajout Projet */
+
+#error-message-modal {
+  display: none;
+  color: black; 
+  background-color: #ffc0cb; 
+  padding: 10px; 
+  margin-bottom: 10px; 
+  border-radius: 5px; 
+  border: 1px solid #ffa0a0; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.9em;
+  margin-top: 5px;
 }
 
 /********************************************** Bannière Mode Édition **********************************************/
