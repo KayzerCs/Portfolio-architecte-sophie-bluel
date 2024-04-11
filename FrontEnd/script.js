@@ -148,9 +148,6 @@ function createGalleryItem(project, className, isModal) {
     // Création de l'icône de corbeille et ajout au bouton
     const deleteIcon = document.createElement("i");
     deleteIcon.className = "fa-solid fa-trash-can";
-    deleteIcon.onclick = function () {
-      deleteProject(project.id);
-    };
 
     // Ajout de l'icône au bouton, puis du bouton à l'élément 'figure'
     button.appendChild(deleteIcon);
