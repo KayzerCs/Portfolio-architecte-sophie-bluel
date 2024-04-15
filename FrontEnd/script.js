@@ -11,7 +11,8 @@ let availableCategories = [];
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
   // Récupère l'état de connexion depuis LocalStorage
-  let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  let authToken = sessionStorage.getItem("authToken");
+  let isLoggedIn = authToken !== null;
 
   // Met à jour l'affichage Connexion/Déconnexion
   loginButton.textContent = isLoggedIn ? "logout" : "login";
@@ -33,8 +34,8 @@ function updateUIBasedOnLogin() {
   loginButton.addEventListener("click", () => {
     // Vérifie si l'utilisateur est actuellement connecté en examinant la variable isLoggedIn.
     if (isLoggedIn) {
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("isLoggedIn");
+      sessionStorage.removeItem("authToken"); // Utilise sessionStorage pour le token également
       isLoggedIn = false;
       window.location.reload();
     }

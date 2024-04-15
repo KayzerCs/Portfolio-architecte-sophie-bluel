@@ -35,8 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("token", data.token); // Stockage du token d'authentification
+        sessionStorage.setItem("authToken", data.token); // Stockage du token dans sessionStorage
         window.location.href = "index.html"; // Redirection vers la page d'accueil
       })
       .catch((error) => {
