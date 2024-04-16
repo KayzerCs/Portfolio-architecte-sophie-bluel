@@ -8,12 +8,14 @@ const inputFile = document.querySelector("#file");
 const imgArea = document.querySelector(".img-area");
 let availableCategories = [];
 
+// Récupère l'état de connexion depuis LocalStorage
+let authToken = sessionStorage.getItem("authToken");
+let isLoggedIn = authToken !== null;
+const tokenIsValid = isTokenValid(authToken);
+console.log(tokenIsValid);
+
 //******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
-  // Récupère l'état de connexion depuis LocalStorage
-  let authToken = sessionStorage.getItem("authToken");
-  let isLoggedIn = authToken !== null;
-
   // Met à jour l'affichage Connexion/Déconnexion
   loginButton.textContent = isLoggedIn ? "logout" : "login";
 
@@ -44,6 +46,38 @@ function updateUIBasedOnLogin() {
       window.location.href = "login.html";
     }
   });
+}
+
+//******* Vérifie si le token es Valide
+function isTokenValid() {
+  const authToken = sessionStorage.getItem("authToken");
+  if (!authToken) {
+    // Token absent
+    return false;
+  }
+
+  try {
+    // Décoder le token pour obtenir les informations, sans vérifier la signature
+    const decodedToken = JSON.parse(atob(authToken.split(".")[1])); // Supposons que le token est encodé en base64
+    if (!decodedToken.exp) {
+      // Pas de date d'expiration, le token est invalide
+      return false;
+    }
+
+    // Convertir la date d'expiration du token en millisecondes
+    const expirationTime = decodedToken.exp * 1000;
+    const currentTime = Date.now();
+    if (expirationTime < currentTime) {
+      // Token expiré
+      return false;
+    }
+
+    // Le token est présent et non expiré
+    return true;
+  } catch (error) {
+    console.error("Erreur lors de la vérification du token :", error);
+    return false;
+  }
 }
 
 //******* Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
@@ -349,11 +383,18 @@ function handleProjectSubmission() {
 
 //******* Soumet les données de projet à l'API via POST, traite la réponse pour mise à jour de l'UI, et gère les erreurs potentielles.
 function submitFormData(formData) {
+  if (!isTokenValid()) {
+    console.error(
+      "Token invalide ou manquant. Impossible de soumettre les données."
+    );
+    return;
+  }
+
   fetch(baseURL + "works", {
     method: "POST",
     body: formData,
     headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
+      Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
     },
   })
     .then((response) => {
@@ -452,12 +493,17 @@ function closeModalAndResetForm() {
 
 //******* Fonction pour supprimer un projet via l'API et mettre à jour l'interface utilisateur, avec gestion des erreurs et authentification.
 function deleteProject(projectId) {
-  const token = localStorage.getItem("token");
+  if (!isTokenValid()) {
+    console.error(
+      "Token invalide ou manquant. Impossible de supprimer l'élément."
+    );
+    return;
+  }
 
   fetch(`http://localhost:5678/api/works/${projectId}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
     },
   })
     .then((response) => {
