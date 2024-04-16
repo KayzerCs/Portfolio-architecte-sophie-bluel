@@ -200,6 +200,13 @@ nav li {
   font-size: 1.2em;
   cursor: pointer;
 }
+a {
+  text-decoration: none;
+  color: black;
+}
+a:hover {
+  color: #b1663c;
+}
 
 li:hover {
   color: #b1663c;
@@ -421,12 +428,12 @@ footer nav ul {
 
 #error-message-modal {
   display: none;
-  color: black; 
-  background-color: #ffc0cb; 
-  padding: 10px; 
-  margin-bottom: 10px; 
-  border-radius: 5px; 
-  border: 1px solid #ffa0a0; 
+  color: black;
+  background-color: #ffc0cb;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ffa0a0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   font-size: 0.9em;
   margin-top: 5px;
