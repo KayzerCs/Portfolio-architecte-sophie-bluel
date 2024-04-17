@@ -8,13 +8,25 @@ const inputFile = document.querySelector("#file");
 const imgArea = document.querySelector(".img-area");
 let availableCategories = [];
 
-// Récupère l'état de connexion depuis LocalStorage
+// Ces lignes de code sont exécutées lorsque le contenu de la page est entièrement chargé.
+document.addEventListener("DOMContentLoaded", function () {
+  fetchAndDisplayProjects();
+  setupModal();
+  updateUIBasedOnLogin();
+  setupProjectSubmission();
+});
+
+//***** CE QUI CONCERNE LA CONNEXION
+
+// Récupère le token d'authentification de la session en cours
 let authToken = sessionStorage.getItem("authToken");
+// Vérifie si l'utilisateur est actuellement connecté en vérifiant si le token d'authentification est présent
 let isLoggedIn = authToken !== null;
+// Vérifie si le token d'authentification est valide en utilisant une fonction isTokenValid()
 const tokenIsValid = isTokenValid(authToken);
 console.log(tokenIsValid);
 
-//******* Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
+// Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
   // Met à jour l'affichage Connexion/Déconnexion
   loginButton.textContent = isLoggedIn ? "logout" : "login";
@@ -48,7 +60,7 @@ function updateUIBasedOnLogin() {
   });
 }
 
-//******* Vérifie si le token es Valide
+// Vérifie si le token es Valide
 function isTokenValid() {
   const authToken = sessionStorage.getItem("authToken");
   if (!authToken) {
@@ -80,15 +92,8 @@ function isTokenValid() {
   }
 }
 
-//******* Écoute l'événement 'DOMContentLoaded' pour s'assurer que le DOM est complètement chargé avant d'exécuter le code
-document.addEventListener("DOMContentLoaded", function () {
-  fetchAndDisplayProjects();
-  setupModal();
-  updateUIBasedOnLogin();
-  setupProjectSubmission();
-});
+//******* CHARGE LES PROJET ET CATÉGORIES DEPUIS L'API
 
-//******* Fonction pour charger les projets et les catégories depuis l'API et les afficher
 function fetchAndDisplayProjects() {
   fetch(baseURL + "categories")
     .then((response) => response.json())
@@ -108,25 +113,81 @@ function fetchAndDisplayProjects() {
     );
 }
 
-// Enrichit un projet avec des détails de catégorie basés sur son categoryId, assignant une catégorie par défaut si non trouvée.
+//******* CATÉGORIES
+
+// Cette fonction complète les informations sur la catégorie d'un projet
 function completeProjectCategory(project) {
-  // Recherche dans le tableau `availableCategories` une catégorie dont l'ID correspond à `project.categoryId`.
+  // Recherche de la catégorie correspondante dans le tableau des catégories disponibles
   const category = availableCategories.find(
     (c) => c.id === parseInt(project.categoryId)
   );
-  // Si une catégorie correspondante est trouvée, met à jour `project` pour inclure les détails complets de cette catégorie.
+  // Vérifie si une catégorie correspondante a été trouvée
   if (category) {
+    // Met à jour les informations de catégorie du projet
     project.category = { id: category.id, name: category.name };
   }
-  // Si aucune catégorie correspondante n'est trouvée, attribue une catégorie par défaut à `project`.
+  // Si aucune catégorie correspondante n'a été trouvée
   else {
+    // Marque le projet comme "Non classifié"
     project.category = { id: null, name: "Non classifié" };
   }
+  // Renvoie le projet complété avec les informations de catégorie
   return project;
 }
 
-//******* Fonction principale pour afficher les projets dans les galeries.
+// Affiche les boutons de filtrage des projets selon les catégories fournies.
+function displayFilterButtons(categories) {
+  // Efface le contenu précédent du conteneur de filtres
+  filterContainer.innerHTML = "";
+
+  // Ajoute un bouton "Tous" au conteneur de filtres
+  filterContainer.appendChild(createFilterButton("all", "Tous"));
+
+  // Pour chaque catégorie, crée et ajoute un bouton de filtre au conteneur de filtres
+  categories.forEach((category) => {
+    filterContainer.appendChild(
+      // Crée un bouton de filtre avec le texte en minuscules correspondant au nom de la catégorie,
+      // tout en utilisant le nom de la catégorie original comme texte visible sur le bouton.
+      createFilterButton(category.name.toLowerCase(), category.name)
+    );
+  });
+}
+
+// Crée un bouton de filtre.
+function createFilterButton(filterId, filterName) {
+  const button = document.createElement("button");
+  // indiquez au navigateur d'afficher le contenu de filterName à l'intérieur du bouton.
+  button.textContent = filterName;
+  button.className = "filter-button";
+  // Stocke l'ID du filtre dans l'attribut de données 'filter' du bouton.
+  button.dataset.filter = filterId;
+
+  // Événement au clic qui filtrera les projets quand ce bouton est cliqué.
+  button.addEventListener("click", () => filterProjects(filterId));
+  // Renvoie l'élément bouton créé pour une utilisation ultérieure.
+  return button;
+}
+
+// Filtre les projets affichés en fonction de la catégorie sélectionné.
+function filterProjects(filterId) {
+  const allProjects = document.querySelectorAll(
+    "#GalleryContainerOriginal figure"
+  );
+
+  // Parcourt chaque projet dans la liste "allProjects"
+  allProjects.forEach((project) => {
+    // Détermine si le projet doit être affiché en fonction du filtre sélectionner.
+    project.style.display =
+      // Affiche le projet si le filtre est "all" ou si sa catégorie correspond au filtre, sinon le masque.
+      filterId === "all" || project.dataset.category === filterId ? "" : "none";
+  });
+}
+
+//******* PROJET
+
+// Fonction principale pour afficher les projets dans les galeries.
 function displayProjects(data) {
+  // Containers Galleries
   const galleryContainerOriginal = document.getElementById(
     "GalleryContainerOriginal"
   );
@@ -134,30 +195,37 @@ function displayProjects(data) {
     "GalleryContainerModal"
   );
 
+  // Vide les containers
   galleryContainerOriginal.innerHTML = "";
   galleryContainerModal.innerHTML = "";
 
-  // Boucle sur chaque projet fourni dans les données
+  // Pour chaque élément dans le tableau 'data', réalise les opérations suivantes :
   data.forEach((project) => {
-    // Création d'un élément pour la galerie originale et ajout au conteneur correspondant
+    // Crée un nouvel élément 'figure' pour représenter le projet dans la galerie d'origine.
     const figureElementOriginal = createGalleryItem(
+      // Il s'agit de l'objet représentant le projet ou l'image à afficher.
       project,
+      //  représente la classe CSS à appliquer à l'élément figure.
       "gallery-item-original",
       false
     );
+
+    // Ajoute l'élément 'figure' créé à la galerie d'origine dans le document HTML.
     galleryContainerOriginal.appendChild(figureElementOriginal);
 
-    // Création d'un élément pour la galerie modale et ajout au conteneur correspondant
+    // Crée un nouvel élément 'figure' pour représenter le projet dans la galerie modale.
     const figureElementModal = createGalleryItem(
       project,
       "gallery-item-modal",
       true
     );
+
+    // Ajoute l'élément 'figure' créé à la galerie modale dans le document HTML.
     galleryContainerModal.appendChild(figureElementModal);
   });
 }
 
-//******* Fonction pour créer un élément de galerie (figure).
+// Fonction pour créer un élément de galerie (figure).
 function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
@@ -196,44 +264,6 @@ function createGalleryItem(project, className, isModal) {
 
   // Retourne l'élément 'figure' complété pour être ajouté au DOM
   return figureElement;
-}
-
-//******* Affiche les boutons de filtrage des projets selon les catégories fournies.
-function displayFilterButtons(categories) {
-  filterContainer.innerHTML = "";
-
-  filterContainer.appendChild(createFilterButton("all", "Tous"));
-
-  categories.forEach((category) => {
-    filterContainer.appendChild(
-      createFilterButton(category.name.toLowerCase(), category.name)
-    );
-  });
-}
-
-//******* Crée un bouton de filtre.
-function createFilterButton(filterId, filterName) {
-  const button = document.createElement("button");
-  button.textContent = filterName;
-  button.className = "filter-button";
-  button.dataset.filter = filterId;
-
-  // Événement au clic qui filtrera les projets quand ce bouton est cliqué.
-  button.addEventListener("click", () => filterProjects(filterId));
-  return button;
-}
-
-//******* Filtre les projets affichés en fonction de la catégorie sélectionné.
-function filterProjects(filterId) {
-  const allProjects = document.querySelectorAll(
-    "#GalleryContainerOriginal figure"
-  );
-
-  // Itère sur chaque projet pour déterminer s'il doit être affiché ou masqué.
-  allProjects.forEach((project) => {
-    project.style.display =
-      filterId === "all" || project.dataset.category === filterId ? "" : "none";
-  });
 }
 
 //******* Configure et gère le comportement de la fenêtre modale dans votre interface utilisateur.
