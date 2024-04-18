@@ -61,8 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Efface les valeurs des champs email et mot de passe
         emailInput.value = "";
         passwordInput.value = "";
-        // Supprime l'élément errorMessageDiv après 2 secondes
-        setTimeout(() => errorMessageDiv.remove(), 2000);
+        // Supprime l'élément errorMessageDiv après 3,5 secondes
+        setTimeout(() => errorMessageDiv.remove(), 3500);
       });
   });
 });
