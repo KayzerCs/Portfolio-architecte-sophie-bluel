@@ -6,7 +6,7 @@ const IconPortfolio = document.querySelector(".icon-portfolio");
 const selectImage = document.querySelector(".upload-img");
 const inputFile = document.querySelector("#file");
 const imgArea = document.querySelector(".img-area");
-let availableCategories = [];
+let CategoriesDispo = [];
 
 // Ces lignes de code sont exécutées lorsque le contenu de la page est entièrement chargé.
 document.addEventListener("DOMContentLoaded", function () {
@@ -24,7 +24,6 @@ let authToken = sessionStorage.getItem("authToken");
 let isLoggedIn = authToken !== null;
 // Vérifie si le token d'authentification est valide en utilisant une fonction isTokenValid()
 const tokenIsValid = isTokenValid(authToken);
-console.log(tokenIsValid);
 
 // Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
@@ -62,31 +61,33 @@ function updateUIBasedOnLogin() {
 
 // Vérifie si le token es Valide
 function isTokenValid() {
+  // Récupérer le token d'authentification depuis le stockage de session
   const authToken = sessionStorage.getItem("authToken");
   if (!authToken) {
-    // Token absent
+    // Si le token est absent, le retourner comme invalide
     return false;
   }
 
   try {
-    // Décoder le token pour obtenir les informations, sans vérifier la signature
-    const decodedToken = JSON.parse(atob(authToken.split(".")[1])); // Supposons que le token est encodé en base64
+    // Essayer de décoder le token pour obtenir les informations sans vérifier la signature.
+    const decodedToken = JSON.parse(atob(authToken.split(".")[1]));
     if (!decodedToken.exp) {
-      // Pas de date d'expiration, le token est invalide
+      // Si le token ne contient pas de date d'expiration, le considérer comme invalide.
       return false;
     }
 
-    // Convertir la date d'expiration du token en millisecondes
+    // Convertir la date d'expiration du token en millisecondes.
     const expirationTime = decodedToken.exp * 1000;
     const currentTime = Date.now();
     if (expirationTime < currentTime) {
-      // Token expiré
+      // Si la date d'expiration est antérieure à l'heure actuelle, le token est expiré.
       return false;
     }
 
-    // Le token est présent et non expiré
+    // Si le token est présent et n'a pas expiré, le considérer comme valide.
     return true;
   } catch (error) {
+    // En cas d'erreur lors de la vérification du token, afficher l'erreur dans la console et considérer le token comme invalide.
     console.error("Erreur lors de la vérification du token :", error);
     return false;
   }
@@ -97,90 +98,23 @@ function isTokenValid() {
 function fetchAndDisplayProjects() {
   fetch(baseURL + "categories")
     .then((response) => response.json())
+    // Une fois les données des catégories obtenues avec succès, exécuter cette fonction
     .then((categoriesData) => {
-      availableCategories = categoriesData;
+      // les données récupérées depuis fetch sont stockées dans CategoriesDispo pour être utilisées par la suite.
+      CategoriesDispo = categoriesData;
+      // Appeler une fonction pour afficher les boutons de filtre en utilisant les données des catégories récupérées
       displayFilterButtons(categoriesData);
     });
 
   fetch(baseURL + "works")
     .then((response) => response.json())
     .then((data) => {
-      const projectsWithCompleteCategories = data.map(completeProjectCategory);
-      displayProjects(projectsWithCompleteCategories);
+      const projetsAvecCategoriesComplètes = data.map(completeProjectCategory);
+      displayProjects(projetsAvecCategoriesComplètes);
     })
     .catch((error) =>
       console.error("Erreur lors de la récupération des données:", error)
     );
-}
-
-//******* CATÉGORIES
-
-// Cette fonction complète les informations sur la catégorie d'un projet
-function completeProjectCategory(project) {
-  // Recherche de la catégorie correspondante dans le tableau des catégories disponibles
-  const category = availableCategories.find(
-    (c) => c.id === parseInt(project.categoryId)
-  );
-  // Vérifie si une catégorie correspondante a été trouvée
-  if (category) {
-    // Met à jour les informations de catégorie du projet
-    project.category = { id: category.id, name: category.name };
-  }
-  // Si aucune catégorie correspondante n'a été trouvée
-  else {
-    // Marque le projet comme "Non classifié"
-    project.category = { id: null, name: "Non classifié" };
-  }
-  // Renvoie le projet complété avec les informations de catégorie
-  return project;
-}
-
-// Affiche les boutons de filtrage des projets selon les catégories fournies.
-function displayFilterButtons(categories) {
-  // Efface le contenu précédent du conteneur de filtres
-  filterContainer.innerHTML = "";
-
-  // Ajoute un bouton "Tous" au conteneur de filtres
-  filterContainer.appendChild(createFilterButton("all", "Tous"));
-
-  // Pour chaque catégorie, crée et ajoute un bouton de filtre au conteneur de filtres
-  categories.forEach((category) => {
-    filterContainer.appendChild(
-      // Crée un bouton de filtre avec le texte en minuscules correspondant au nom de la catégorie,
-      // tout en utilisant le nom de la catégorie original comme texte visible sur le bouton.
-      createFilterButton(category.name.toLowerCase(), category.name)
-    );
-  });
-}
-
-// Crée un bouton de filtre.
-function createFilterButton(filterId, filterName) {
-  const button = document.createElement("button");
-  // indiquez au navigateur d'afficher le contenu de filterName à l'intérieur du bouton.
-  button.textContent = filterName;
-  button.className = "filter-button";
-  // Stocke l'ID du filtre dans l'attribut de données 'filter' du bouton.
-  button.dataset.filter = filterId;
-
-  // Événement au clic qui filtrera les projets quand ce bouton est cliqué.
-  button.addEventListener("click", () => filterProjects(filterId));
-  // Renvoie l'élément bouton créé pour une utilisation ultérieure.
-  return button;
-}
-
-// Filtre les projets affichés en fonction de la catégorie sélectionné.
-function filterProjects(filterId) {
-  const allProjects = document.querySelectorAll(
-    "#GalleryContainerOriginal figure"
-  );
-
-  // Parcourt chaque projet dans la liste "allProjects"
-  allProjects.forEach((project) => {
-    // Détermine si le projet doit être affiché en fonction du filtre sélectionner.
-    project.style.display =
-      // Affiche le projet si le filtre est "all" ou si sa catégorie correspond au filtre, sinon le masque.
-      filterId === "all" || project.dataset.category === filterId ? "" : "none";
-  });
 }
 
 //******* PROJET
@@ -203,7 +137,7 @@ function displayProjects(data) {
   data.forEach((project) => {
     // Crée un nouvel élément 'figure' pour représenter le projet dans la galerie d'origine.
     const figureElementOriginal = createGalleryItem(
-      // Il s'agit de l'objet représentant le projet ou l'image à afficher.
+      // Il s'agit de l'objet représentant l'image à afficher.
       project,
       //  représente la classe CSS à appliquer à l'élément figure.
       "gallery-item-original",
@@ -225,7 +159,7 @@ function displayProjects(data) {
   });
 }
 
-// Fonction pour créer un élément de galerie (figure).
+// Fonction pour créer un élément (figure).
 function createGalleryItem(project, className, isModal) {
   // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
@@ -266,6 +200,76 @@ function createGalleryItem(project, className, isModal) {
 
   // Retourne l'élément 'figure' complété pour être ajouté au DOM
   return figureElement;
+}
+
+//******* CATÉGORIES
+
+// Associe un ID de catégorie à un nom de catégorie.
+function completeProjectCategory(project) {
+  // Recherche la catégorie correspondante dans la liste des catégories disponibles.
+  const category = CategoriesDispo.find(
+    // Compare les id de catégorie pour trouver une correspondance avec celui du projet.
+    (c) => c.id === parseInt(project.categoryId)
+  );
+
+  // Vérifie si une catégorie correspondante a été trouvée.
+  if (category) {
+    // Si une catégorie correspondante est trouvée, met à jour les informations de catégorie du projet.
+    project.category = { id: category.id, name: category.name };
+  } else {
+    // Si aucune catégorie correspondante n'est trouvée, marque le projet comme "Non classifié".
+    project.category = { id: null, name: "Non classifié" };
+  }
+
+  // Renvoie le projet avec les informations de catégorie complétées.
+  return project;
+}
+
+// Crée un bouton de filtre.
+function createFilterButton(filterId, filterName) {
+  const button = document.createElement("button");
+  // indiquez au navigateur d'afficher le contenu de filterName à l'intérieur du bouton.
+  button.textContent = filterName;
+  button.className = "filter-button";
+  // Stocke l'ID du filtre dans l'attribut de données 'filter' du bouton.
+  button.dataset.filter = filterId;
+
+  // Événement au clic qui filtrera les projets quand ce bouton est cliqué.
+  button.addEventListener("click", () => filterProjects(filterId));
+  // Renvoie l'élément bouton créé pour une utilisation ultérieure.
+  return button;
+}
+
+// Affiche les boutons de filtrage des projets selon les catégories fournies.
+function displayFilterButtons(categories) {
+  // Efface le contenu précédent du conteneur de filtres
+  filterContainer.innerHTML = "";
+
+  // Ajoute un bouton "Tous" au conteneur de filtres
+  filterContainer.appendChild(createFilterButton("all", "Tous"));
+
+  // Pour chaque catégorie, crée et ajoute un bouton de filtre au conteneur de filtres
+  categories.forEach((category) => {
+    filterContainer.appendChild(
+      // Crée un bouton de filtre avec le texte en minuscules correspondant au nom de la catégorie,
+      // tout en utilisant le nom de la catégorie original comme texte visible sur le bouton.
+      createFilterButton(category.name.toLowerCase(), category.name)
+    );
+  });
+}
+
+// Filtre les projets affichés en fonction de la catégorie sélectionné.
+function filterProjects(filterId) {
+  const allProjects = document.querySelectorAll(
+    "#GalleryContainerOriginal figure"
+  );
+
+  // Parcourt chaque projet dans la liste "allProjects"
+  allProjects.forEach((project) => {
+    project.style.display =
+      // Affiche le projet si le filtre est "all" ou si sa catégorie correspond au filtre, sinon le masque.
+      filterId === "all" || project.dataset.category === filterId ? "" : "none";
+  });
 }
 
 //***** MODAL
@@ -340,7 +344,7 @@ function setupModal() {
       defaultOption.selected = true; // Option par défaut est sélectionnée par défaut.
       select.appendChild(defaultOption); // Ajoute l'option par défaut au sélecteur.
 
-      // Itère sur chaque catégorie reçue dans les données JSON
+      // Affiche les catégories reçues dans les données JSON.
       data.forEach((categorie) => {
         let option = document.createElement("option");
         option.value = categorie.id;
@@ -357,7 +361,7 @@ function setupModal() {
     inputFile.click();
   });
 
-  // Gère le changement de fichier dans un champ d'entrée de type fichier.
+  // Gère le fichier selectionner dans Input File.
   function handleFileChange() {
     // Récupère le fichier sélectionné dans le champ d'entrée de type fichier.
     const image = inputFile.files[0];
@@ -400,11 +404,76 @@ function setupModal() {
   });
 }
 
-// Initialise l'écouteur d'événements sur le bouton de soumission pour gérer la soumission de projets.
+// Met en place l'écouteur d'événements sur le bouton de validation pour gérer la soumission des projets
 function setupProjectSubmission() {
   document
     .querySelector(".valide")
     .addEventListener("click", handleProjectSubmission);
+}
+
+//Fonction pour fermer la modale et réinitialiser le formulaire une fois l'action faite
+function closeModalAndResetForm() {
+  const modal = document.getElementById("myModal");
+  modal.style.display = "none";
+
+  const form = document.getElementById("addProjectForm");
+  form.reset();
+
+  const categorySelect = document.getElementById("categorie");
+  categorySelect.value = "";
+
+  const imgPreview = document.querySelector(".changeable-image");
+  imgPreview.remove();
+}
+
+//***** AJOUT PROJET
+
+//Valide le fichier, le titre, et la catégorie du formulaire avant envoi : vérifie la présence et la taille adéquate de l'image.
+function validateFormData(file, title, categoryId) {
+  // Sélectionnez l'élément qui affichera le message d'erreur
+  const errorMessageElement = document.getElementById("error-message-modal");
+
+  // trim() = Supprime les espaces blancs au début et à la fin d'une chaîne de caractères.
+  if (!file || !title.trim() || !categoryId) {
+    errorMessageElement.textContent =
+      "Tous les champs sont requis (image, titre, catégorie).";
+    errorMessageElement.style.display = "block"; //
+    setTimeout(() => {
+      errorMessageElement.style.display = "none";
+    }, 3500);
+    return false;
+  }
+
+  // Pour obtenir 4 Mo en octets, on multiplie 4 par 1024 pour obtenir le nombre de Ko, puis par 1024 à nouveau pour obtenir le nombre total d'octets.
+  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB
+  if (file.size > MAX_SIZE_ALLOWED) {
+    errorMessageElement.textContent =
+      "La taille de l'image dépasse la limite autorisée de 4MB.";
+    errorMessageElement.style.display = "block";
+    setTimeout(() => {
+      errorMessageElement.style.display = "none";
+    }, 3500);
+    // Indique que la validation a échoué en retournant false.
+    return false;
+  }
+  // Si la taille du fichier est inférieure ou égale à la limite autorisée, la validation réussit.
+  return true;
+}
+
+// Construit un objet FormData pour l'envoi de fichiers et de données de projet via une requête HTTP.
+function buildFormData(file, title, category) {
+  // Crée un nouvel objet FormData, qui est utilisé pour envoyer des données de formulaire via une requête HTTP.
+  const formData = new FormData();
+
+  // Ajoute le fichier sélectionné à l'objet FormData, sous la clé "image".
+  formData.append("image", file);
+  // Ajoute le titre du projet à l'objet FormData, sous la clé "title".
+  formData.append("title", title);
+  // Ajoute la catégorie du projet à l'objet FormData, sous la clé "category".
+  formData.append("category", category);
+
+  // Retourne l'objet FormData construit avec les données du fichier, du titre et de la catégorie du projet.
+  return formData;
 }
 
 // Gère la soumission d'un nouveau projet en validant et préparant les données du formulaire.
@@ -475,54 +544,6 @@ function submitFormData(formData) {
     });
 }
 
-//Valide le fichier, le titre, et la catégorie du formulaire avant envoi : vérifie la présence et la taille adéquate de l'image.
-function validateFormData(file, title, categoryId) {
-  // Sélectionnez l'élément qui affichera le message d'erreur
-  const errorMessageElement = document.getElementById("error-message-modal");
-
-  // trim() = Supprime les espaces blancs au début et à la fin d'une chaîne de caractères.
-  if (!file || !title.trim() || !categoryId) {
-    errorMessageElement.textContent =
-      "Tous les champs sont requis (image, titre, catégorie).";
-    errorMessageElement.style.display = "block"; //
-    setTimeout(() => {
-      errorMessageElement.style.display = "none";
-    }, 3500);
-    return false;
-  }
-
-  // Pour obtenir 4 Mo en octets, on multiplie 4 par 1024 pour obtenir le nombre de Ko, puis par 1024 à nouveau pour obtenir le nombre total d'octets.
-  const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB
-  if (file.size > MAX_SIZE_ALLOWED) {
-    errorMessageElement.textContent =
-      "La taille de l'image dépasse la limite autorisée de 4MB.";
-    errorMessageElement.style.display = "block";
-    setTimeout(() => {
-      errorMessageElement.style.display = "none";
-    }, 3500);
-    // Indique que la validation a échoué en retournant false.
-    return false;
-  }
-  // Si la taille du fichier est inférieure ou égale à la limite autorisée, la validation réussit.
-  return true;
-}
-
-// Construit un objet FormData pour l'envoi de fichiers et de données de projet via une requête HTTP.
-function buildFormData(file, title, category) {
-  // Crée un nouvel objet FormData, qui est utilisé pour envoyer des données de formulaire via une requête HTTP.
-  const formData = new FormData();
-
-  // Ajoute le fichier sélectionné à l'objet FormData, sous la clé "image".
-  formData.append("image", file);
-  // Ajoute le titre du projet à l'objet FormData, sous la clé "title".
-  formData.append("title", title);
-  // Ajoute la catégorie du projet à l'objet FormData, sous la clé "category".
-  formData.append("category", category);
-
-  // Retourne l'objet FormData construit avec les données du fichier, du titre et de la catégorie du projet.
-  return formData;
-}
-
 // Ajoute un élément de projet aux galeries originale et modale, puis réinitialise la modale de soumission.
 function addToGalleries(project) {
   const figureElementOriginal = createGalleryItem(
@@ -546,20 +567,7 @@ function addToGalleries(project) {
   closeModalAndResetForm();
 }
 
-//Fonction pour fermer la modale et réinitialiser le formulaire une fois l'action faite
-function closeModalAndResetForm() {
-  const modal = document.getElementById("myModal");
-  modal.style.display = "none";
-
-  const form = document.getElementById("addProjectForm");
-  form.reset();
-
-  const categorySelect = document.getElementById("categorie");
-  categorySelect.value = "";
-
-  const imgPreview = document.querySelector(".changeable-image");
-  imgPreview.remove();
-}
+//***** SUPPRIME PROJET
 
 // Cette fonction supprime un projet du serveur en utilisant une requête HTTP DELETE.
 function deleteProject(projectId) {

@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
       password: password,
     };
 
-    // Effectue une requête POST vers l'URL baseURL + "users/login" avec les données de connexion
+    // Effectue une requête POST avec les données de connexion
     fetch(baseURL + "users/login", {
       method: "POST",
       headers: {
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify(loginData), // Convertit l'objet loginData en format JSON pour l'envoi
     })
       .then((response) => {
-        // Si la réponse n'est pas OK (code d'état HTTP différent de 200)
+        // Si la réponse n'est pas OK.
         if (!response.ok) {
           // Lance une erreur avec le message de la réponse ou un message par défaut
           return response.json().then((body) => {
@@ -46,12 +46,15 @@ document.addEventListener("DOMContentLoaded", function () {
         // Si la réponse est OK, retourne les données de la réponse au format JSON
         return response.json();
       })
+
+      // data = reponse JSON
       .then((data) => {
         // Stocke le token d'authentification dans le sessionStorage
         sessionStorage.setItem("authToken", data.token);
         // Redirige l'utilisateur vers la page d'accueil (index.html)
         window.location.href = "index.html";
       })
+
       .catch((error) => {
         // En cas d'erreur lors du traitement de la promesse
         // Affiche le message d'erreur dans l'élément errorMessageDiv
