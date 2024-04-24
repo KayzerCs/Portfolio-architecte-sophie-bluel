@@ -16,28 +16,33 @@ document.addEventListener("DOMContentLoaded", function () {
   setupProjectSubmission();
 });
 
-//***** CE QUI CONCERNE LA CONNEXION
+//** CE QUI CONCERNE LA CONNEXION
 
-// Récupère le token d'authentification de la session en cours
+// La méthode 'sessionStorage.getItem("authToken")' est utilisée pour récupérer la valeur du token d'authentification de la session en cours.
+// La valeur est stockée dans la variable 'authToken' pour une utilisation ultérieure.
 let authToken = sessionStorage.getItem("authToken");
-// Vérifie si l'utilisateur est actuellement connecté en vérifiant si le token d'authentification est présent
+
+// Déclaration d'une variable 'isLoggedIn' pour stocker un indicateur d'état de connexion.
+// L'expression 'authToken !== null' est évaluée pour vérifier si la variable 'authToken' contient une valeur non nulle.
+// Si 'authToken' est différent de null, cela signifie qu'un token d'authentification est présent et que l'utilisateur est considéré comme connecté.
 let isLoggedIn = authToken !== null;
-// Vérifie si le token d'authentification est valide en utilisant une fonction isTokenValid()
+
+// Déclaration d'une constante 'tokenIsValid' pour stocker le résultat de l'appel à la fonction 'isTokenValid' avec 'authToken' comme argument.
+// La fonction 'isTokenValid' est appelée pour vérifier la validité du jeton d'authentification 'authToken'.
 const tokenIsValid = isTokenValid(authToken);
 
 // Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
-  // Met à jour l'affichage Connexion/Déconnexion
+  // L'expression ternaire 'isLoggedIn ? "logout" : "login"' est utilisée pour déterminer le texte à afficher sur le bouton.
+  // Si 'isLoggedIn' est true, le texte sera "logout", indiquant à l'utilisateur qu'il peut se déconnecter.
   loginButton.textContent = isLoggedIn ? "logout" : "login";
 
-  // Quand Connecté
+  // Condition : Vérifie si l'utilisateur est connecté.
   if (isLoggedIn) {
     filterContainer.style.display = "none";
     editionContainer.style.display = "";
     IconPortfolio.style.display = "";
-  }
-  // Quand Déconnecté
-  else {
+  } else {
     filterContainer.style.display = "";
     editionContainer.style.display = "none";
     IconPortfolio.style.display = "none";
@@ -45,71 +50,107 @@ function updateUIBasedOnLogin() {
 
   // Événement au clic sur le bouton de connexion (loginButton).
   loginButton.addEventListener("click", () => {
-    // Vérifie si l'utilisateur est actuellement connecté en examinant la variable isLoggedIn.
     if (isLoggedIn) {
-      sessionStorage.removeItem("isLoggedIn");
-      sessionStorage.removeItem("authToken"); // Utilise sessionStorage pour le token également
+      sessionStorage.removeItem("isLoggedIn"); // Supprime la clé "isLoggedIn" du stockage de session.
+      sessionStorage.removeItem("authToken"); // Supprime la clé "authToken" du stockage de session.
+
+      // Met à jour la variable 'isLoggedIn' à false pour indiquer que l'utilisateur est déconnecté.
       isLoggedIn = false;
+
+      // Recharge la page actuelle pour refléter les changements,pour masquer les fonctionnalités réservées aux utilisateurs connectés.
+      // L'objet global 'window' représente la fenêtre du navigateur.
+      // La propriété 'location' de 'window' permet de manipuler l'URL de la page.
+      // La méthode 'reload()' de 'window.location' permet de recharger la page actuelle.
       window.location.reload();
-    }
-    // Si l'utilisateur n'est pas connecté (isLoggedIn est faux), redirige vers la page de connexion.
-    else {
+    } else {
+      // Redirige l'utilisateur vers une autre page en modifiant l'URL dans la barre d'adresse du navigateur.
+      // En affectant une nouvelle URL à la propriété 'href' de 'location', le navigateur est automatiquement redirigé vers la nouvelle page.
       window.location.href = "login.html";
     }
   });
 }
 
-// Vérifie si le token es Valide
+// Définition de la fonction isTokenValid, qui vérifie si un Token d'authentification est valide.
 function isTokenValid() {
-  // Récupérer le token d'authentification depuis le stockage de session
+  // Récupération du jeton d'authentification depuis le stockage de session.
+  // La méthode 'getItem' récupère la valeur associée à la clé spécifiée dans le stockage de session.
+  // Dans ce cas, elle récupère la valeur associée à la clé "authToken".
   const authToken = sessionStorage.getItem("authToken");
+
+  // Vérification si le jeton d'authentification n'est pas défini ou null.
   if (!authToken) {
-    // Si le token est absent, le retourner comme invalide
+    // Si le jeton d'authentification est inexistant, la fonction retourne false, indiquant qu'il n'est pas valide.
     return false;
   }
 
+  // Tentative de décodage du jeton d'authentification pour vérifier son expiration.
   try {
-    // Essayer de décoder le token pour obtenir les informations sans vérifier la signature.
+    // Décodage et extraction des informations du jeton d'authentification.
+    // - La méthode 'atob' décode une chaîne de caractères encodée en base64.
+    // La méthode 'split' est utilisée pour diviser la chaîne de caractères du jeton d'authentification en parties distinctes à chaque fois que le caractère '.' est rencontré.
+    // - La méthode 'JSON.parse' est ensuite utilisée pour convertir la partie décodée du jeton, qui est en format JSON, en un objet JavaScript.
+    // - La constante 'decodedToken' contient les informations extraites et décodées du jeton d'authentification.
     const decodedToken = JSON.parse(atob(authToken.split(".")[1]));
+
+    // Vérifie si le jeton d'authentification décodé contient une propriété 'exp' (expiration).
+    // La propriété 'exp' est généralement utilisée pour spécifier la date d'expiration du token.
     if (!decodedToken.exp) {
-      // Si le token ne contient pas de date d'expiration, le considérer comme invalide.
+      // Si la propriété 'exp' est absente ou évaluée à faux, cela signifie que le jeton ne spécifie pas de date d'expiration.
+      // Dans ce cas, le jeton est considéré comme invalide et la fonction retourne false.
       return false;
     }
 
-    // Convertir la date d'expiration du token en millisecondes.
+    // Convertit le temps d'expiration du jeton en millisecondes.
+    // Certains systèmes stockent le temps d'expiration des token en tant que nombre de secondes depuis une certaine date.
+    // En multipliant par 1000, cela converti cette valeur en millisecondes, ce qui est le format de temps couramment utilisé en Js.
     const expirationTime = decodedToken.exp * 1000;
+
+    // Récupère le temps actuel en millisecondes.
+    // La méthode 'Date.now()' retourne un nombre représentant le nombre de millisecondes écoulées depuis le 1er janvier 1970 00:00:00 UTC.
+    // Cela fournit une référence de temps actuelle précise pour comparer avec le temps d'expiration du token.
     const currentTime = Date.now();
+
+    // Comparaison du temps d'expiration avec le temps actuel pour vérifier si le token a expiré.
     if (expirationTime < currentTime) {
-      // Si la date d'expiration est antérieure à l'heure actuelle, le token est expiré.
+      // Si le temps d'expiration est inférieur au temps actuel, la fonction retourne false, indiquant que le jeton a expiré.
       return false;
     }
 
-    // Si le token est présent et n'a pas expiré, le considérer comme valide.
+    // Si le jeton n'est pas expiré, la fonction retourne true, indiquant que le jeton est valide.
     return true;
   } catch (error) {
-    // En cas d'erreur lors de la vérification du token, afficher l'erreur dans la console et considérer le token comme invalide.
+    // En cas d'erreur lors de la tentative de décodage du jeton, un message d'erreur est affiché dans la console.
     console.error("Erreur lors de la vérification du token :", error);
+    // La fonction retourne false, indiquant que le jeton n'est pas valide en raison de l'erreur de décodage.
     return false;
   }
 }
 
-//******* CHARGE LES PROJET ET CATÉGORIES DEPUIS L'API
+//** CHARGE LES PROJET ET CATÉGORIES DEPUIS L'API
 
 function fetchAndDisplayProjects() {
   fetch(baseURL + "categories")
     .then((response) => response.json())
-    // Une fois les données des catégories obtenues avec succès, exécuter cette fonction
+
+    // Une fois les données des catégories obtenues avec succès, exécuter la fonction.
     .then((categoriesData) => {
       // les données récupérées depuis fetch sont stockées dans CategoriesDispo pour être utilisées par la suite.
       CategoriesDispo = categoriesData;
-      // Appeler une fonction pour afficher les boutons de filtre en utilisant les données des catégories récupérées
+      // Appeler une fonction pour afficher les boutons de filtre en utilisant les données des catégories récupérées.
       displayFilterButtons(categoriesData);
     });
 
   fetch(baseURL + "works")
     .then((response) => response.json())
+
+    // data représente les données JSON obtenues à partir de la réponse de l'API.
     .then((data) => {
+      // La méthode 'map' parcourt chaque élément de 'data' et applique la fonction 'completeProjectCategory' à chacun.
+      // La fonction 'completeProjectCategory' est une fonction de transformation qui reçoit un élément de 'data' en entrée et retourne un nouvel élément avec les catégories complétées.
+      // 'projetsAvecCategoriesComplètes' est un nouveau tableau obtenu en appliquant la fonction 'completeProjectCategory' à chaque élément individuel de 'data'.
       const projetsAvecCategoriesComplètes = data.map(completeProjectCategory);
+
+      // Affiche les projets avec les catégories complétées dans l'interface utilisateur.
       displayProjects(projetsAvecCategoriesComplètes);
     })
     .catch((error) =>
@@ -141,10 +182,13 @@ function displayProjects(data) {
       project,
       //  représente la classe CSS à appliquer à l'élément figure.
       "gallery-item-original",
+      // false est utilisé pour spécifier si l'image est cliquable ou non.
       false
     );
 
-    // Ajoute l'élément 'figure' créé à la galerie d'origine dans le document HTML.
+    // appendChild
+    // Ajoute l'élément 'figureElementOriginal' à la fin de la liste des enfants de 'galleryContainerOriginal'.
+    // Cela permet d'afficher 'figureElementOriginal' à l'intérieur de 'galleryContainerOriginal' dans l'interface utilisateur.
     galleryContainerOriginal.appendChild(figureElementOriginal);
 
     // Crée un nouvel élément 'figure' pour représenter le projet dans la galerie modale.
@@ -154,41 +198,46 @@ function displayProjects(data) {
       true
     );
 
-    // Ajoute l'élément 'figure' créé à la galerie modale dans le document HTML.
     galleryContainerModal.appendChild(figureElementModal);
   });
 }
 
-// Fonction pour créer un élément (figure).
+// Fonction pour créer un élément (figure) dans sa globalité.
 function createGalleryItem(project, className, isModal) {
-  // Création d'un élément 'figure' et configuration de ses propriétés
   const figureElement = document.createElement("figure");
   figureElement.className = `${className} project`;
-  // Cela permet d'associer une catégorie à cet élément
+
+  // Utilise l'attribut de données personnalisé 'category' de l'élément 'figureElement'.
+  // Les attributs de données personnalisés sont accessibles via l'objet 'dataset' d'un élément HTML.
+  // Cela permet de stocker et d'accéder à des informations supplémentaires directement dans le HTML.
   figureElement.dataset.category = project.category.name.toLowerCase();
+
   // On lui donne un ID
   figureElement.setAttribute("data-id", project.id);
 
-  // Création et configuration de l'élément 'img' pour l'image du projet
+  // Création et configuration de l'élément 'img' pour l'image du projet.
   const imageElement = document.createElement("img");
-  imageElement.src = project.imageUrl;
+
+  // Définit le texte alternatif de l'image pour l'accessibilité avec le titre du projet.
+  // Le texte alternatif est affiché lorsque l'image ne peut pas être chargée ou lorsque l'utilisateur utilise un lecteur d'écran.
   imageElement.alt = project.title;
+  imageElement.src = project.imageUrl;
   imageElement.title = project.title;
 
-  // Ajout de l'image au 'figure'
+  // Ajout de l'image au 'figure'.
   figureElement.appendChild(imageElement);
 
   if (isModal) {
-    // Pour la galerie modale, ajout d'un bouton qui contiendra l'icône de corbeille pour la suppression
+    // Pour la galerie modale, ajout d'un bouton qui contiendra l'icône de corbeille pour la suppression.
     const button = document.createElement("button");
     button.className = "delete-btn";
     button.setAttribute("type", "button");
 
-    // Création de l'icône de corbeille et ajout au bouton
+    // Création de l'icône de corbeille et ajout au bouton.
     const deleteIcon = document.createElement("i");
     deleteIcon.className = "fa-solid fa-trash-can";
 
-    // Ajout de l'icône au bouton, puis du bouton à l'élément 'figure'
+    // Ajout de l'icône au bouton, puis du bouton à l'élément 'figure'.
     button.appendChild(deleteIcon);
     figureElement.appendChild(button);
   } else {
@@ -198,57 +247,63 @@ function createGalleryItem(project, className, isModal) {
     figureElement.appendChild(figcaptionElement);
   }
 
-  // Retourne l'élément 'figure' complété pour être ajouté au DOM
+  // Retourne l'élément 'figure' complété pour être ajouté au DOM.
   return figureElement;
 }
 
-//******* CATÉGORIES
+//** CATÉGORIES
 
-// Associe un ID de catégorie à un nom de catégorie.
+// Cette fonction prend un projet en paramètre et complète sa catégorie en fonction de l'ID de catégorie spécifié dans le projet.
+// Elle recherche une catégorie correspondante dans le tableau CategoriesDispo en comparant les IDs, puis attribue la catégorie correspondante au projet.
 function completeProjectCategory(project) {
-  // Recherche la catégorie correspondante dans la liste des catégories disponibles.
+  // Recherche une catégorie dans le tableau CategoriesDispo en utilisant la méthode find().
+  // La méthode find() parcour sur chaque élément du tableau jusqu'à ce qu'elle trouve un élément répondant à la condition spécifiée.
+  // Ici, la condition vérifie si l'ID de la catégorie actuelle (c.id) correspond à l'ID de la catégorie du projet (project.categoryId).
+  // Avant la comparaison, project.categoryId est converti en entier avec parseInt() car il pourrait être stocké sous forme de chaîne de caractères.
+  // Le résultat de la recherche est stocké dans la variable category.
   const category = CategoriesDispo.find(
-    // Compare les id de catégorie pour trouver une correspondance avec celui du projet.
     (c) => c.id === parseInt(project.categoryId)
   );
 
-  // Vérifie si une catégorie correspondante a été trouvée.
+  // Vérifie si une catégorie correspondante a été trouvée pour le projet dans l'API.
   if (category) {
-    // Si une catégorie correspondante est trouvée, met à jour les informations de catégorie du projet.
+    // Si une catégorie correspondante est trouvée, les propriétés id et name de cette catégorie sont assimilées à project.category.
     project.category = { id: category.id, name: category.name };
   } else {
-    // Si aucune catégorie correspondante n'est trouvée, marque le projet comme "Non classifié".
+    // Si aucune catégorie correspondante n'est trouvée dans l'API, attribue une catégorie par défaut au projet.
     project.category = { id: null, name: "Non classifié" };
   }
 
-  // Renvoie le projet avec les informations de catégorie complétées.
+  // Retourne le projet complété.
   return project;
 }
 
 // Crée un bouton de filtre.
 function createFilterButton(filterId, filterName) {
   const button = document.createElement("button");
-  // indiquez au navigateur d'afficher le contenu de filterName à l'intérieur du bouton.
-  button.textContent = filterName;
+
+  button.textContent = filterName; // indiquez au navigateur d'afficher le contenu de filterName à l'intérieur du bouton.
+  button.dataset.filter = filterId; // Stocke l'ID du filtre dans l'attribut de données 'filter' du bouton.
   button.className = "filter-button";
-  // Stocke l'ID du filtre dans l'attribut de données 'filter' du bouton.
-  button.dataset.filter = filterId;
 
   // Événement au clic qui filtrera les projets quand ce bouton est cliqué.
   button.addEventListener("click", () => filterProjects(filterId));
+
   // Renvoie l'élément bouton créé pour une utilisation ultérieure.
   return button;
 }
 
 // Affiche les boutons de filtrage des projets selon les catégories fournies.
 function displayFilterButtons(categories) {
-  // Efface le contenu précédent du conteneur de filtres
+  // Efface le contenu précédent du conteneur de filtres.
   filterContainer.innerHTML = "";
 
   // Ajoute un bouton "Tous" au conteneur de filtres
   filterContainer.appendChild(createFilterButton("all", "Tous"));
 
-  // Pour chaque catégorie, crée et ajoute un bouton de filtre au conteneur de filtres
+  // Pour chaque catégorie, crée et ajoute un bouton de filtre au conteneur de filtres.
+  // Le forEach est utilisé pour parcourir sur chaque élément du tableau categories.
+  // La fonction de rappel prend un paramètre "category" qui représente chaque catégorie dans le tableau.
   categories.forEach((category) => {
     filterContainer.appendChild(
       // Crée un bouton de filtre avec le texte en minuscules correspondant au nom de la catégorie,
@@ -272,12 +327,14 @@ function filterProjects(filterId) {
   });
 }
 
-//***** MODAL
+//** MODAL
 
 // Configure et gère le comportement de la fenêtre modale dans votre interface utilisateur.
 function setupModal() {
-  // Événements au clic  sur icons pour affichier la modal.
   const icons = document.querySelectorAll(".icon");
+
+  // La méthode forEach est utilisé pour ajouter un gestionnaire d'événements à chaque icône du tableau "icons".
+  // Lorsqu'une icône (Mode édition / modifier) est cliquée, une fonction est déclenchée pour afficher la modal.
   icons.forEach((icon) => {
     icon.addEventListener("click", () => {
       const modal = document.getElementById("myModal");
@@ -363,28 +420,38 @@ function setupModal() {
 
   // Gère le fichier selectionner dans Input File.
   function handleFileChange() {
-    // Récupère le fichier sélectionné dans le champ d'entrée de type fichier.
+    // La propriété files est utilisée pour accéder à la liste des fichiers sélectionnés dans le champ de type fichier.
+    // L'indice [0] est utilisé pour accéder au premier fichier dans la liste des fichiers sélectionnés.
     const image = inputFile.files[0];
+
     // Vérifie si un fichier a été sélectionné.
     if (image) {
-      // Crée un objet FileReader pour lire le contenu du fichier.
+      // Crée un nouvel objet FileReader.
+      // FileReader est une interface JavaScript qui permet à une application web de lire le contenu d'un fichier.
       const reader = new FileReader();
 
-      // Évenement "onload" = Définit une fonction à exécuter une fois que le chargement d'une ressource est terminé avec succès.
+      // L'événement 'load' est déclenché lorsque le chargement d'un fichier est terminé.
+      // Lorsque le FileReader a fini de lire le contenu du fichier sélectionné, il déclenche cet événement.
+      // À ce moment-là, la fonction de rappel associée à 'onload' est exécutée.
       reader.onload = () => {
-        // Vérifie s'il existe déjà une image dans la zone d'affichage et la supprime le cas échéant.
+        // Récupère l'élément img existant dans la zone imgArea, s'il existe déjà.
         const existingImg = imgArea.querySelector("img");
+        // Vérifie s'il existe déjà une image dans la zone imgArea.
+        // Si une image existe, elle est supprimée de la zone imgArea pour la remplacer par la nouvelle image chargée.
         if (existingImg) {
           imgArea.removeChild(existingImg);
         }
 
-        // Récupère l'URL du fichier lu.
+        // Récupère l'URL du fichier chargé à partir de la propriété result du FileReader.
         const imgUrl = reader.result;
-        // Crée un élément 'img' avec l'URL du fichier lu.
+
         const img = document.createElement("img");
+
+        // Attribu l'URL de l'image récupérée par le FileReader à la propriété src de l'élément img.
         img.src = imgUrl;
-        img.classList.add("changeable-image"); // Ajoute une classe pour le style ou le comportement.
-        // Ajoute l'élément 'img' à la zone d'affichage.
+        img.classList.add("changeable-image");
+
+        // Ajoute l'élément img à la zone imgArea pour afficher l'image chargée.
         imgArea.appendChild(img);
       };
 
@@ -396,9 +463,14 @@ function setupModal() {
   // Écouteur d'événement sur inputFile pour détecter quand un utilisateur sélectionne un fichier.
   inputFile.addEventListener("change", handleFileChange);
 
-  // Événement au clic sur imgArea pour re sélectionner un fichier.
+  // Ajoute un gestionnaire d'événements "click" à la zone imgArea.
+  // Lorsque la zone imgArea est cliquée, cette fonction de rappel est déclenchée.
   imgArea.addEventListener("click", function (event) {
+    // Vérifie si l'élément sur lequel l'événement "click" a été déclenché contient la classe CSS "changeable-image".
+    // Cela signifie que l'utilisateur a cliqué sur une image qui peut être modifiée.
     if (event.target.classList.contains("changeable-image")) {
+      // Si l'image cliquée est modifiable, déclenche un clic programmé sur le champ de type fichier inputFile.
+      // Cela ouvre la boîte de dialogue de sélection de fichier, permettant à l'utilisateur de sélectionner une nouvelle image.
       inputFile.click();
     }
   });
@@ -413,39 +485,46 @@ function setupProjectSubmission() {
 
 //Fonction pour fermer la modale et réinitialiser le formulaire une fois l'action faite
 function closeModalAndResetForm() {
+  // Fait disparaitre la modal.
   const modal = document.getElementById("myModal");
   modal.style.display = "none";
 
+  // Reset le formulaire.
   const form = document.getElementById("addProjectForm");
   form.reset();
 
+  // Vide le selecteur de catégories.
   const categorySelect = document.getElementById("categorie");
   categorySelect.value = "";
 
+  // Supprime l'image prévisualiser.
   const imgPreview = document.querySelector(".changeable-image");
   imgPreview.remove();
 }
 
-//***** AJOUT PROJET
+//** AJOUT PROJET
 
-//Valide le fichier, le titre, et la catégorie du formulaire avant envoi : vérifie la présence et la taille adéquate de l'image.
+//Valide le fichier, le titre, et la catégorie du formulaire avant envoi. Vérifie aussi la présence et la taille adéquate de l'image.
 function validateFormData(file, title, categoryId) {
-  // Sélectionnez l'élément qui affichera le message d'erreur
+  // Sélectionnez l'élément qui affichera le message d'erreur.
   const errorMessageElement = document.getElementById("error-message-modal");
 
+  // Vérifie si l'un des champs requis (fichier, titre non vide, categoryId) est manquant ou vide.
   // trim() = Supprime les espaces blancs au début et à la fin d'une chaîne de caractères.
   if (!file || !title.trim() || !categoryId) {
     errorMessageElement.textContent =
       "Tous les champs sont requis (image, titre, catégorie).";
-    errorMessageElement.style.display = "block"; //
+    errorMessageElement.style.display = "block";
     setTimeout(() => {
       errorMessageElement.style.display = "none";
     }, 3500);
+    // Retourne false pour indiquer que la validation a échoué.
     return false;
   }
 
   // Pour obtenir 4 Mo en octets, on multiplie 4 par 1024 pour obtenir le nombre de Ko, puis par 1024 à nouveau pour obtenir le nombre total d'octets.
   const MAX_SIZE_ALLOWED = 4 * 1024 * 1024; // 4MB
+  // Si la taille du fichier dépasse la limite autorisée, affiche un message d'erreur.
   if (file.size > MAX_SIZE_ALLOWED) {
     errorMessageElement.textContent =
       "La taille de l'image dépasse la limite autorisée de 4MB.";
@@ -453,7 +532,6 @@ function validateFormData(file, title, categoryId) {
     setTimeout(() => {
       errorMessageElement.style.display = "none";
     }, 3500);
-    // Indique que la validation a échoué en retournant false.
     return false;
   }
   // Si la taille du fichier est inférieure ou égale à la limite autorisée, la validation réussit.
@@ -479,9 +557,11 @@ function buildFormData(file, title, category) {
 // Gère la soumission d'un nouveau projet en validant et préparant les données du formulaire.
 function handleProjectSubmission() {
   const fileInput = document.querySelector('input[type="file"]'); // Récupère l'élément input de type fichier du formulaire.
-  const file = fileInput ? fileInput.files[0] : null; // Récupère le fichier sélectionné par l'utilisateur.
   const title = document.querySelector("#titre").value; // Récupère la valeur du champ de saisie du titre du projet.
   const category = document.querySelector("#categorie").value; // Récupère la valeur du champ de sélection de la catégorie du projet.
+
+  // Récupère le premier fichier sélectionné par l'utilisateur à partir de l'élément fileInput, s'il existe, sinon attribue null à la variable file.
+  const file = fileInput ? fileInput.files[0] : null;
 
   // Vérifie si les données du formulaire sont valides.
   if (!validateFormData(file, title, category)) {
@@ -497,13 +577,13 @@ function handleProjectSubmission() {
 
 // Soumet les données du formulaire au serveur.
 function submitFormData(formData) {
-  // Vérifie si le jeton d'authentification est valide.
+  // Vérifie si le token d'authentification est valide.
   if (!isTokenValid()) {
     // Affiche une erreur dans la console si le jeton est invalide ou manquant.
     console.error(
       "Token invalide ou manquant. Impossible de soumettre les données."
     );
-    return; // Arrête le traitement si le jeton est invalide ou manquant.
+    return; // Arrête le traitement si le token est invalide ou manquant.
   }
 
   // Envoie une requête POST au serveur avec les données du formulaire.
@@ -511,6 +591,7 @@ function submitFormData(formData) {
     method: "POST",
     body: formData, // Corps de la requête contenant les données du formulaire.
     headers: {
+      // Le mot-clé "Bearer" dans l'en-tête "Authorization" indique à l'API que le token inclus dans cet en-tête est utilisé pour l'authentification.
       Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
     },
   })
@@ -524,7 +605,9 @@ function submitFormData(formData) {
       // Transforme la réponse en format JSON.
       return response.json();
     })
+
     // Traite les données JSON renvoyées par le serveur.
+    // data = aux données du projet envoyées via le formulaire dans la requête POST.
     .then((data) => {
       // Vérifie si les données du projet sont complètes.
       if (data && data.id && data.imageUrl && data.title && data.categoryId) {
@@ -549,6 +632,7 @@ function addToGalleries(project) {
   const figureElementOriginal = createGalleryItem(
     project,
     "gallery-item-original",
+    // false = projet non cliquable.
     false
   );
   document
@@ -567,10 +651,11 @@ function addToGalleries(project) {
   closeModalAndResetForm();
 }
 
-//***** SUPPRIME PROJET
+//** SUPPRIME PROJET
 
 // Cette fonction supprime un projet du serveur en utilisant une requête HTTP DELETE.
 function deleteProject(projectId) {
+  // Vérifie si le token d'authentification est invalide ou manquant.
   if (!isTokenValid()) {
     console.error(
       "Token invalide ou manquant. Impossible de supprimer l'élément."
@@ -582,6 +667,7 @@ function deleteProject(projectId) {
   fetch(`http://localhost:5678/api/works/${projectId}`, {
     method: "DELETE",
     headers: {
+      // Le mot-clé "Bearer" dans l'en-tête "Authorization" indique à l'API que le token inclus dans cet en-tête est utilisé pour l'authentification.
       Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
     },
   })
@@ -618,8 +704,11 @@ function deleteProject(projectId) {
 // Fonction pour supprimer un projet du DOM en utilisant son ID de projet.
 function removeProjectFromDOM(projectId) {
   document
+    // Sélectionne tous les éléments de projet avec l'attribut 'data-id' correspondant à l'ID du projet à supprimer.
     .querySelectorAll(`.project[data-id="${projectId}"]`)
+    // Pour chaque élément correspondant trouvé...
     .forEach((project) => {
+      // Supprime l'élément du DOM.
       project.remove();
     });
 }
@@ -630,7 +719,7 @@ document
   // Pour chaque élément sélectionné, ajoute un écouteur d'événement 'click'
   .forEach((container) => {
     container.addEventListener("click", function (event) {
-      // Vérifie si le bouton cliqué ou l'un de ses ancêtres a la classe "delete-btn"
+      // Recherche l'élément le plus proche correspondant à la classe CSS ".delete-btn" à partir de l'élément cible de l'événement.
       const deleteBtn = event.target.closest(".delete-btn");
 
       // Si un bouton de suppression est trouvé
