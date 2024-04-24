@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setupProjectSubmission();
 });
 
-//***** CE QUI CONCERNE LA CONNEXION
+// CE QUI CONCERNE LA CONNEXION
 
 // Récupère le token d'authentification de la session en cours
 let authToken = sessionStorage.getItem("authToken");
@@ -93,7 +93,7 @@ function isTokenValid() {
   }
 }
 
-//******* CHARGE LES PROJET ET CATÉGORIES DEPUIS L'API
+// CHARGE LES PROJET ET CATÉGORIES DEPUIS L'API
 
 function fetchAndDisplayProjects() {
   fetch(baseURL + "categories")
@@ -117,7 +117,7 @@ function fetchAndDisplayProjects() {
     );
 }
 
-//******* PROJET
+// PROJET
 
 // Fonction principale pour afficher les projets dans les galeries.
 function displayProjects(data) {
@@ -202,7 +202,7 @@ function createGalleryItem(project, className, isModal) {
   return figureElement;
 }
 
-//******* CATÉGORIES
+// CATÉGORIES
 
 // Associe un ID de catégorie à un nom de catégorie.
 function completeProjectCategory(project) {
@@ -272,7 +272,7 @@ function filterProjects(filterId) {
   });
 }
 
-//***** MODAL
+// MODAL
 
 // Configure et gère le comportement de la fenêtre modale dans votre interface utilisateur.
 function setupModal() {
@@ -426,7 +426,7 @@ function closeModalAndResetForm() {
   imgPreview.remove();
 }
 
-//***** AJOUT PROJET
+// AJOUT PROJET
 
 //Valide le fichier, le titre, et la catégorie du formulaire avant envoi : vérifie la présence et la taille adéquate de l'image.
 function validateFormData(file, title, categoryId) {
@@ -567,7 +567,7 @@ function addToGalleries(project) {
   closeModalAndResetForm();
 }
 
-//***** SUPPRIME PROJET
+// SUPPRIME PROJET
 
 // Cette fonction supprime un projet du serveur en utilisant une requête HTTP DELETE.
 function deleteProject(projectId) {
