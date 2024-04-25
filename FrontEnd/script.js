@@ -27,9 +27,6 @@ let authToken = sessionStorage.getItem("authToken");
 // Si 'authToken' est différent de null, cela signifie qu'un token d'authentification est présent et que l'utilisateur est considéré comme connecté.
 let isLoggedIn = authToken !== null;
 
-// Déclaration d'une constante 'tokenIsValid' pour stocker le résultat de l'appel à la fonction 'isTokenValid' avec 'authToken' comme argument.
-// La fonction 'isTokenValid' est appelée pour vérifier la validité du jeton d'authentification 'authToken'.
-const tokenIsValid = isTokenValid(authToken);
 
 // Gestion de l'affichage de l'interface utilisateur (UI) en fonction de l'état de connexion de l'utilisateur
 function updateUIBasedOnLogin() {
@@ -70,7 +67,7 @@ function updateUIBasedOnLogin() {
   });
 }
 
-// Définition de la fonction isTokenValid, qui vérifie si un Token d'authentification est valide.
+// Définition de la fonction isTokenValid, qui vérifie si le Token d'authentification est valide.
 function isTokenValid() {
   // Récupération du jeton d'authentification depuis le stockage de session.
   // La méthode 'getItem' récupère la valeur associée à la clé spécifiée dans le stockage de session.
@@ -205,6 +202,7 @@ function displayProjects(data) {
 // Fonction pour créer un élément (figure) dans sa globalité.
 function createGalleryItem(project, className, isModal) {
   const figureElement = document.createElement("figure");
+  //${className} représente "gallery-item-original" et "gallery-item-modal".
   figureElement.className = `${className} project`;
 
   // Utilise l'attribut de données personnalisé 'category' de l'élément 'figureElement'.
@@ -306,7 +304,7 @@ function displayFilterButtons(categories) {
   // La fonction de rappel prend un paramètre "category" qui représente chaque catégorie dans le tableau.
   categories.forEach((category) => {
     filterContainer.appendChild(
-      // Crée un bouton de filtre avec le texte en minuscules correspondant au nom de la catégorie,
+      // Crée un bouton de filtre avec le texte en minuscules pour l'attribut data-filter,
       // tout en utilisant le nom de la catégorie original comme texte visible sur le bouton.
       createFilterButton(category.name.toLowerCase(), category.name)
     );
@@ -322,7 +320,9 @@ function filterProjects(filterId) {
   // Parcourt chaque projet dans la liste "allProjects"
   allProjects.forEach((project) => {
     project.style.display =
-      // Affiche le projet si le filtre est "all" ou si sa catégorie correspond au filtre, sinon le masque.
+      // Si filterId est égal à "all" OU si le projet appartient à la catégorie spécifiée par filterId,
+      // alors l'affichage du projet est autorisé, sinon le projet est masqué.
+      //dataset = Cela permet de récupérer la catégorie associée à ce projet spécifique, stockée dans l'attribut data-category.
       filterId === "all" || project.dataset.category === filterId ? "" : "none";
   });
 }
@@ -722,22 +722,22 @@ document
       // Recherche l'élément le plus proche correspondant à la classe CSS ".delete-btn" à partir de l'élément cible de l'événement.
       const deleteBtn = event.target.closest(".delete-btn");
 
-      // Si un bouton de suppression est trouvé
+      // Si un bouton de suppression est trouvé.
       if (deleteBtn) {
-        // Trouve l'élément parent de la classe "project"
+        // Trouve l'élément parent de la classe "project".
         const projectElement = deleteBtn.closest(".project");
 
-        // Si un élément "project" est trouvé
+        // Si un élément "project" est trouvé.
         if (projectElement) {
-          // Récupère l'attribut "data-id" de l'élément "project" qui contient l'identifiant du projet
+          // Récupère l'attribut "data-id" de l'élément "project" qui contient l'ID du projet.
           const projectId = projectElement.getAttribute("data-id");
 
-          // Si un identifiant de projet est trouvé
+          // Si un identifiant de projet est trouvé.
           if (projectId) {
-            // Appelle la fonction pour supprimer le projet avec l'identifiant correspondant
+            // Appelle la fonction pour supprimer le projet avec l'identifiant correspondant.
             deleteProject(projectId);
           } else {
-            // Affiche un message d'erreur si aucun identifiant de projet valide n'est trouvé
+            // Affiche un message d'erreur si aucun identifiant de projet valide n'est trouvé.
             console.error(
               "Impossible de trouver l'élément projet avec un ID valide."
             );
